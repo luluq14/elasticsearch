@@ -27,3 +27,29 @@ Route::get('/', function () {
  * @apiSampleRequest /search
  */
 Route::post('/search', 'ApiController@search');
+
+/**
+ * @api {post} /search/single Searching Single Keywords
+ *
+ * @apiGroup Search
+ * @apiVersion 0.0.1
+ *
+ * @apiParam {String} keywords
+ * @apiParam {Int} page
+ * @apiParam {Int} limit
+ * @apiSampleRequest /search/single
+ */
+Route::post('/search/single', 'ApiController@single');
+
+/**
+ * @api {post} /search/multiple Searching Multiple Keywords
+ *
+ * @apiGroup Search
+ * @apiVersion 0.0.1
+ *
+ * @apiParam {String} keywords
+ * @apiParam {Int} page
+ * @apiParam {Int} limit
+ * @apiSampleRequest /search/multiple
+ */
+Route::post('/search/multiple', 'ApiController@multiple');
