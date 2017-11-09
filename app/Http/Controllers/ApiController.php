@@ -220,10 +220,10 @@ class ApiController extends BaseController
             $result[$key]['mctgr_nm']=  $value['_source']['mctgr_nm'];
             $result[$key]['buy_satisfy']=  $value['_source']['buy_satisfy'];
         }
-        $response['query1']=$query1;
-        $response['query2']=$query2;
-        $response['query3']=$query3;
-        $response['query4']=$query4;
+//        $response['query1']=$query1;
+//        $response['query2']=$query2;
+//        $response['query3']=$query3;
+//        $response['query4']=$query4;
         return $response;
     }
 }
