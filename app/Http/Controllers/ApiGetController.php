@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class ApiController extends BaseController
+class ApiGetController extends BaseController
 {
     private $host;
     public function __construct()
@@ -26,11 +26,8 @@ class ApiController extends BaseController
         ];
     }
 
-    public function single(Request $request){
-        (empty($request->input('keywords')))?$query="iphone":$query=$request->input('keywords');
-        (empty($request->input('page')))?$page=1:$page=$request->input('page');
-        (empty($request->input('limit')))?$limit=10:$limit=$request->input('limit');
-
+    public function single(Request $request,$keywords="",$page=0,$limit=10){
+        $query=$keywords;
         $params = [
             'index' => 'oracle-prod',
             'from' => $page,
@@ -109,10 +106,8 @@ class ApiController extends BaseController
         return $response;
     }
 
-    public function multiple(Request $request){
-        (empty($request->input('keywords')))?$query="iphone":$query=$request->input('keywords');
-        (empty($request->input('page')))?$page=1:$page=$request->input('page');
-        (empty($request->input('limit')))?$limit=10:$limit=$request->input('limit');
+    public function multiple(Request $request,$keywords="",$page=0,$limit=10){
+        $query=$keywords;
 
         $res=explode(" ",$query);
         $total=count($res);
