@@ -110,11 +110,11 @@ class ApiController extends BaseController
     }
 
     public function multiple(Request $request){
-        (empty($request->input('keywords')))?$query="iphone":$query=$request->input('keywords');
+        (empty($request->input('keywords')))?$keywords="iphone":$keywords=$request->input('keywords');
         (empty($request->input('page')))?$page=1:$page=$request->input('page');
         (empty($request->input('limit')))?$limit=10:$limit=$request->input('limit');
 
-        $res=explode(" ",$query);
+        $res=explode(" ",$keywords);
         $total=count($res);
         $multi=[];
 
