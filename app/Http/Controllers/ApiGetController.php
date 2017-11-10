@@ -111,22 +111,83 @@ class ApiGetController extends BaseController
 
         $res=explode(" ",$query);
         $total=count($res);
-        if($total==1){
-            $query1=@$res[0];
-            $query2=@$res[0];
-            $query3=@$res[$total-1];
-            $query4=@$res[$total-1];
-        }elseif(@$res[1]>=1){
-            $query1=@$res[0].' '.@$res[1];
-            $query2=@$res[1].' '.@$res[2];
-            $query3=@$res[2].' '.@$res[3];
-            $query4=@$res[$total-1];
+        $multi=[];
+
+        if($total==2){
+            $query=@$res[0].' '.@$res[1];
+            $multi[0]= [
+                "multi_match"=>[
+                    "query"=>$query,
+                    "type" => 'phrase_prefix',
+                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
+                    "tie_breaker" => 1.0
+                ]
+            ];
+            $multi[1]= [
+                "multi_match"=>[
+                    "query"=>$query,
+                    "type" => 'cross_fields',
+                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
+                    "tie_breaker" => 1.0
+                ]
+            ];
         }else{
-            $query1=@$res[0].' '.@$res[1];
-            $query2=@$res[1].' '.@$res[2];
-            $query3=@$res[2].' '.@$res[3];
-            $query4=@$res[$total-1];
+            for($i=0;$i<$total;$i++){
+                if($i==0){
+                    $type='phrase_prefix';
+                }else{
+                    $type='cross_fields';
+                }
+
+                $query=@$res[$i].' '.@$res[$i+1];
+
+                $multi[$i]= [
+                    "multi_match"=>[
+                        "query"=>$query,
+                        "type" => $type,
+                        "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
+                        "tie_breaker" => 1.0
+                    ]
+                ];
+            }
         }
+
+        if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
+            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords)) ){
+            $hasil=[
+                'must' =>$multi,
+                'filter' => [
+                    "range"=>[
+                        "buy_satisfy"=>[
+                            "gte"=> 0,
+                            "lte"=> 100
+                        ]
+                    ]
+                ]
+            ];
+        }else{
+            $hasil=[
+                'must' =>$multi,
+                'must_not'=>[
+                    "multi_match"=>[
+                        "query"=>"Aksesoris",
+                        "fields"=>[
+                            "mctgr_nm^10"
+                        ]
+                    ]
+                ],
+                'filter' => [
+                    "range"=>[
+                        "buy_satisfy"=>[
+                            "gte"=> 0,
+                            "lte"=> 100
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+//        print_r($hasil);die();
 
         $params = [
             'index' => 'oracle-prod',
@@ -141,58 +202,7 @@ class ApiGetController extends BaseController
                 ],
                 'min_score'=>1.0,
                 'query' => [
-                    'bool' => [
-                        'must' => [
-                            [
-                                "multi_match"=>[
-                                    "query"=>$query1,
-                                    "type" => "phrase_prefix",
-                                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                                    "tie_breaker" => 1.0
-                                ]
-                            ],
-                            [
-                                "multi_match"=>[
-                                    "query"=>$query2,
-                                    "type" => "phrase_prefix",
-                                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                                    "tie_breaker" => 1.0
-                                ]
-                            ],
-                            [
-                                "multi_match"=>[
-                                    "query"=>$query3,
-                                    "type" => "cross_fields",
-                                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                                    "tie_breaker" => 1.0
-                                ]
-                            ],
-                            [
-                                "multi_match"=>[
-                                    "query"=>$query4,
-                                    "type" => "cross_fields",
-                                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                                    "tie_breaker" => 1.0
-                                ]
-                            ]
-                        ],
-                        'must_not' => [
-                            "multi_match"=>[
-                                "query"=>"Aksesoris",
-                                "fields"=>[
-                                    "mctgr_nm^10"
-                                ]
-                            ]
-                        ],
-                        'filter' => [
-                            "range"=>[
-                                "buy_satisfy"=>[
-                                    "gte"=> 0,
-                                    "lte"=> 100
-                                ]
-                            ]
-                        ]
-                    ]
+                    'bool' => $hasil
                 ]
             ]
         ];
@@ -205,7 +215,6 @@ class ApiGetController extends BaseController
         $response = $client->search($params);
         $result=[];
         foreach ($response['hits']['hits'] as $key => $value){
-//            print_r($value);die();
             $result[$key]['pop_score']= $value['_source']['pop_score'];
             $result[$key]['prd_nm']=  $value['_source']['prd_nm'];
             $result[$key]['prd_no']=  $value['_source']['prd_no'];
@@ -215,10 +224,7 @@ class ApiGetController extends BaseController
             $result[$key]['mctgr_nm']=  $value['_source']['mctgr_nm'];
             $result[$key]['buy_satisfy']=  $value['_source']['buy_satisfy'];
         }
-//        $response['query1']=$query1;
-//        $response['query2']=$query2;
-//        $response['query3']=$query3;
-//        $response['query4']=$query4;
+
         return $response;
     }
 }
