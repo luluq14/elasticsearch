@@ -107,80 +107,29 @@ class ApiGetController extends BaseController
     }
 
     public function multiple(Request $request,$keywords="",$page=0,$limit=10){
-        $query=$keywords;
 
-        $res=explode(" ",$query);
-        $total=count($res);
-        $multi=[];
-
-        if($total==2){
-            $query=@$res[0].' '.@$res[1];
-            $multi[0]= [
-                "multi_match"=>[
-                    "query"=>$query,
-                    "type" => 'phrase_prefix',
-                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                    "tie_breaker" => 1.0
+        $multi=[
+            "common"=>[
+                "prd_nm"=>[
+                    "query"=>$keywords,
+                    "cutoff_frequency" => 1.0
                 ]
-            ];
-            $multi[1]= [
-                "multi_match"=>[
-                    "query"=>$query,
-                    "type" => 'cross_fields',
-                    "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                    "tie_breaker" => 1.0
-                ]
-            ];
-        }else{
-            for($i=0;$i<$total;$i++){
-                if($i==0){
-                    $type='phrase_prefix';
-                }else{
-                    $type='cross_fields';
-                }
-
-                $query=@$res[$i].' '.@$res[$i+1];
-
-                $multi[$i]= [
-                    "multi_match"=>[
-                        "query"=>$query,
-                        "type" => $type,
-                        "fields"=> [ "prd_nm^10","brand_nm^10","sctgr_nm^10"],
-                        "tie_breaker" => 1.0
-                    ]
-                ];
-            }
-        }
+            ],
+        ];
 
         if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
             || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords)) ){
             $hasil=[
                 'must' =>$multi,
-                'filter' => [
-                    "range"=>[
-                        "buy_satisfy"=>[
-                            "gte"=> 0,
-                            "lte"=> 100
-                        ]
-                    ]
-                ]
             ];
         }else{
             $hasil=[
                 'must' =>$multi,
                 'must_not'=>[
-                    "multi_match"=>[
-                        "query"=>"Aksesoris",
-                        "fields"=>[
-                            "mctgr_nm^10"
-                        ]
-                    ]
-                ],
-                'filter' => [
-                    "range"=>[
-                        "buy_satisfy"=>[
-                            "gte"=> 0,
-                            "lte"=> 100
+                    "common"=>[
+                        "mctgr_nm"=>[
+                            "query"=>"Aksesoris",
+                            "cutoff_frequency"=> 1.0
                         ]
                     ]
                 ]

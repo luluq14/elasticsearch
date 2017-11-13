@@ -114,6 +114,80 @@ class ApiController extends BaseController
         (empty($request->input('page')))?$page=1:$page=$request->input('page');
         (empty($request->input('limit')))?$limit=10:$limit=$request->input('limit');
 
+        $multi=[
+                    "common"=>[
+                        "prd_nm"=>[
+                            "query"=>$keywords,
+                            "cutoff_frequency" => 1.0
+                        ]
+                    ],
+                ];
+
+        if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
+            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords)) ){
+            $hasil=[
+                'must' =>$multi
+            ];
+        }else{
+            $hasil=[
+                'must' =>$multi,
+                'must_not'=>[
+                    "multi_match"=>[
+                        "query"=>"Aksesoris",
+                        "fields"=>[
+                            "mctgr_nm^10"
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+//        print_r($hasil);die();
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            '_source'=>["prd_no","prd_nm","brand_nm","lctgr_nm","sctgr_nm","mctgr_nm","pop_score","buy_satisfy","create_dt","sale_score","sale_score2"],
+            'body' => [
+                'sort' => [
+                    'pop_score' => [
+                        'order' => 'desc'
+                    ]
+                ],
+                'min_score'=>1.0,
+                'query' => [
+                    'bool' => $hasil
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        $result=[];
+        foreach ($response['hits']['hits'] as $key => $value){
+            $result[$key]['pop_score']= $value['_source']['pop_score'];
+            $result[$key]['prd_nm']=  $value['_source']['prd_nm'];
+            $result[$key]['prd_no']=  $value['_source']['prd_no'];
+            $result[$key]['brand_nm']=  $value['_source']['brand_nm'];
+            $result[$key]['lctgr_nm']= $value['_source']['lctgr_nm'];
+            $result[$key]['sctgr_nm']= $value['_source']['sctgr_nm'];
+            $result[$key]['mctgr_nm']=  $value['_source']['mctgr_nm'];
+            $result[$key]['buy_satisfy']=  $value['_source']['buy_satisfy'];
+        }
+
+        return $response;
+    }
+
+    public function multiple_backup(Request $request){
+        (empty($request->input('keywords')))?$keywords="iphone":$keywords=$request->input('keywords');
+        (empty($request->input('page')))?$page=1:$page=$request->input('page');
+        (empty($request->input('limit')))?$limit=10:$limit=$request->input('limit');
+
         $res=explode(" ",$keywords);
         $total=count($res);
         $multi=[];
