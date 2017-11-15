@@ -35,19 +35,6 @@ class ApiController extends BaseController
             'index' => 'oracle-prod',
             'from' => $page,
             'size' =>$limit,
-            '_source'=>[
-                "prd_no",
-                "prd_nm",
-                "brand_nm",
-                "lctgr_nm",
-                "sctgr_nm",
-                "mctgr_nm",
-                "pop_score",
-                "buy_satisfy",
-                "create_dt",
-                "sale_score",
-                "sale_score2"
-            ],
             'body' => [
                 'sort' => [
                     'pop_score' => [
@@ -124,7 +111,20 @@ class ApiController extends BaseController
                 ];
 
         if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
-            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords)) ){
+            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords))
+            || (preg_match('/tempered glass /',$keywords)) || (preg_match('/ tempered glass /',$keywords))
+            || (preg_match('/baterai /',$keywords)) || (preg_match('/ baterai /',$keywords))
+            || (preg_match('/anti gores /',$keywords)) || (preg_match('/ anti gores /',$keywords))
+            || (preg_match('/screen protector /',$keywords)) || (preg_match('/ screen protector /',$keywords))
+            || (preg_match('/charger /',$keywords)) || (preg_match('/ charger /',$keywords))
+            || (preg_match('/sparepart /',$keywords)) || (preg_match('/ sparepart /',$keywords))
+            || (preg_match('/kabel data /',$keywords)) || (preg_match('/ kabel data /',$keywords))
+            || (preg_match('/powerbank /',$keywords)) || (preg_match('/ powerbank /',$keywords))
+            || (preg_match('/stand handphone /',$keywords)) || (preg_match('/ stand handphone /',$keywords))
+            || (preg_match('/tongsis /',$keywords)) || (preg_match('/ tongsis /',$keywords))
+            || (preg_match('/lensa handphone /',$keywords)) || (preg_match('/ lensa handphone /',$keywords))
+
+        ){
             $hasil=[
                 'must' =>$multi
             ];
@@ -148,7 +148,6 @@ class ApiController extends BaseController
             'index' => 'oracle-prod',
             'from' => $page,
             'size' =>$limit,
-            '_source'=>["prd_no","prd_nm","brand_nm","lctgr_nm","sctgr_nm","mctgr_nm","pop_score","buy_satisfy","create_dt","sale_score","sale_score2"],
             'body' => [
                 'sort' => [
                     'pop_score' => [
