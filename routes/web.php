@@ -16,45 +16,7 @@ Route::get('/', function () {
 });
 
 /**
- * @api {post} /search/single Searching Single Keywords
- *
- * @apiGroup Search Post
- * @apiVersion 0.0.1
- *
- * @apiParam {String} keywords
- * @apiParam {Int} page
- * @apiParam {Int} limit
- * @apiSampleRequest /search/single
- */
-Route::post('/search/single', 'ApiController@single');
-
-/**
- * @api {post} /search/multiple Searching Multiple Keywords
- *
- * @apiGroup Search Post
- * @apiVersion 0.0.1
- *
- * @apiParam {String} keywords
- * @apiParam {Int} page
- * @apiParam {Int} limit
- * @apiSampleRequest /search/multiple
- */
-Route::post('/search/multiple', 'ApiController@multiple');
-
-/**
- * @api {get} /search/single/{keywords}/{page}/{limit} Searching Single Keywords
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/single/iphone/0/10
- *
- */
-Route::get('/search/single/{keywords}/{page}/{limit}', 'ApiGetController@single');
-
-/**
- * @api {get} /search/multiple/{keywords}/{page}/{limit} Searching Multiple Keywords
+ * @api {get} /search/multiple/{keywords}/{page}/{limit} Searching
  *
  * @apiGroup Search Get
  * @apiVersion 0.0.1
@@ -63,3 +25,50 @@ Route::get('/search/single/{keywords}/{page}/{limit}', 'ApiGetController@single'
  * @apiSampleRequest /search/multiple/iphone/0/10
  */
 Route::get('/search/multiple/{keywords}/{page}/{limit}', 'ApiGetController@multiple');
+
+/**
+ * @api {get} /mctgr/{keywords}/{page}/{limit} List Mctgr
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /mctgr/iphone/0/10
+ */
+Route::get('/mctgr/{keywords}/{page}/{limit}', 'ApiGetController@Mctgr');
+
+/**
+ * @api {get} /search/mctgr/{prdnm}/{mctgr}/{page}/{limit} Searching Mctgr
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /search/mctgr/iphone/mobile%20phone/0/10
+ */
+Route::get('/search/mctgr/{prdnm}/{mctgr}/{page}/{limit}', 'ApiGetController@searchByMctgr');
+
+/**
+ * @api {get} /sctgr/{mctgr}/{prdnm}/{page}/{limit} List Sctgr
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {mctgr} type string, not empty parameter {mctgr} to search document
+ * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
+ * @apiSampleRequest /sctgr/mobile%20phone/samsung/0/10
+ */
+Route::get('/sctgr/{prdnm}/{sctgr}/{page}/{limit}', 'ApiGetController@Sctgr');
+
+/**
+ * @api {get} /search/sctgr/{prdnm}/{sctgr}/{page}/{limit} Searching Sctgr 
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
+ * @apiDescription {sctgr} type string, not empty parameter {sctgr} to search document
+ * @apiSampleRequest /search/sctgr/iphone%206/iphone/0/10
+ */
+Route::get('/search/sctgr/{prdnm}/{sctgr}/{page}/{limit}', 'ApiGetController@SearchBySctgr');

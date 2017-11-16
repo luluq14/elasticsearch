@@ -26,73 +26,6 @@ class ApiGetController extends BaseController
         ];
     }
 
-    public function single(Request $request,$keywords="",$page=0,$limit=10){
-        $query=$keywords;
-        $params = [
-            'index' => 'oracle-prod',
-            'from' => $page,
-            'size' =>$limit,
-            'body' => [
-                'sort' => [
-                    'pop_score' => [
-                        'order' => 'desc'
-                    ]
-                ],
-                'min_score'=>1.0,
-                'query' => [
-                    'bool' => [
-                        'must' => [
-                            "multi_match"=>[
-                                "query"=>$query,
-                                "fields"=>[
-                                    "sctgr_nm^10",
-                                    "prd_nm^5"
-                                ]
-                            ]
-                        ],
-                        'must_not' => [
-                            "multi_match"=>[
-                                "query"=>"Aksesoris",
-                                "fields"=>[
-                                    "mctgr_nm^10"
-                                ]
-                            ]
-                        ],
-                        'filter' => [
-                            "range"=>[
-                                "buy_satisfy"=>[
-                                    "gte"=> 0,
-                                    "lte"=> 100
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        $result=[];
-        foreach ($response['hits']['hits'] as $key => $value){
-//            print_r($value);die();
-            $result[$key]['pop_score']= $value['_source']['pop_score'];
-            $result[$key]['prd_nm']=  $value['_source']['prd_nm'];
-            $result[$key]['prd_no']=  $value['_source']['prd_no'];
-            $result[$key]['brand_nm']=  $value['_source']['brand_nm'];
-            $result[$key]['lctgr_nm']= $value['_source']['lctgr_nm'];
-            $result[$key]['sctgr_nm']= $value['_source']['sctgr_nm'];
-            $result[$key]['mctgr_nm']=  $value['_source']['mctgr_nm'];
-            $result[$key]['buy_satisfy']=  $value['_source']['buy_satisfy'];
-        }
-
-        return $response;
-    }
-
     public function multiple(Request $request,$keywords="",$page=0,$limit=10){
 
         $multi=[
@@ -161,18 +94,208 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
-        $result=[];
-        foreach ($response['hits']['hits'] as $key => $value){
-            $result[$key]['pop_score']= $value['_source']['pop_score'];
-            $result[$key]['prd_nm']=  $value['_source']['prd_nm'];
-            $result[$key]['prd_no']=  $value['_source']['prd_no'];
-            $result[$key]['brand_nm']=  $value['_source']['brand_nm'];
-            $result[$key]['lctgr_nm']= $value['_source']['lctgr_nm'];
-            $result[$key]['sctgr_nm']= $value['_source']['sctgr_nm'];
-            $result[$key]['mctgr_nm']=  $value['_source']['mctgr_nm'];
-            $result[$key]['buy_satisfy']=  $value['_source']['buy_satisfy'];
-        }
+        return $response;
+    }
 
+    public function Mctgr(Request $request,$keywords="",$page=0,$limit=10){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            "common"=>[
+                                "prd_nm"=>[
+                                    "query"=> $keywords,
+                                    "cutoff_frequency"=> 0.0001
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_state"=> [
+                        "terms"=> [
+                            "field"=> "mctgr_nm.keyword"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function searchByMctgr(Request $request,$prdnm="",$mctgr="",$page=0,$limit=10){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $prdnm,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "common"=>[
+                                    "mctgr_nm"=>[
+                                        "query"=> $mctgr,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ]
+                ],
+                'sort' => [
+                    'pop_score' => [
+                        'order' => 'desc'
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function Sctgr(Request $request,$mctgr="",$prdnm="",$page=0,$limit=10){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' =>[
+                            [
+                                "common"=>[
+                                    "mctgr_nm"=>[
+                                        "query"=> $mctgr,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $prdnm,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_state"=> [
+                        "terms"=> [
+                            "field"=> "sctgr_nm.keyword"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function SearchBySctgr(Request $request,$prdnm="",$sctgr="",$page=0,$limit=10){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' =>[
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $prdnm,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "common"=>[
+                                    "sctgr_nm"=>[
+                                        "query"=> $sctgr,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ]
+                ],
+                'sort' => [
+                    'pop_score' => [
+                        'order' => 'desc'
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
         return $response;
     }
 }
