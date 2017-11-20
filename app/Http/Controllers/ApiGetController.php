@@ -84,7 +84,19 @@ class ApiGetController extends BaseController
                 'min_score'=>1.0,
                 'query' => [
                     'bool' => $hasil
-                ]
+                ],
+                'aggs' =>[
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ]
+                ],
             ]
         ];
 
@@ -94,32 +106,47 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
+        $response["key"]=$keywords;
         return $response;
     }
 
-    public function Mctgr(Request $request,$keywords="",$page=0,$limit=10){
+    public function Mctgr(Request $request,$keyword_lct="",$keyword=""){
 
         $params = [
             'index' => 'oracle-prod',
-            'from' => $page,
-            'size' =>$limit,
+            'size' =>0,
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [
-                            "common"=>[
-                                "prd_nm"=>[
-                                    "query"=> $keywords,
-                                    "cutoff_frequency"=> 0.0001
+                        'must' =>[
+                            [
+                                "common"=>[
+                                    "lctgr_nm"=>[
+                                        "query"=> $keyword_lct,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $keyword,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
                                 ]
                             ]
                         ]
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_state"=> [
+                    "group_by_nm"=> [
                         "terms"=> [
                             "field"=> "mctgr_nm.keyword"
+                        ]
+                    ],
+                    "group_by_no"=> [
+                        "terms"=> [
+                            "field"=> "mctgr_no"
                         ]
                     ]
                 ]
@@ -134,6 +161,7 @@ class ApiGetController extends BaseController
         $response = $client->search($params);
         return $response;
     }
+
 
     public function searchByMctgr(Request $request,$prdnm="",$mctgr="",$page=0,$limit=10){
 
@@ -190,10 +218,53 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
+        $response["key"]=$prdnm;
         return $response;
     }
 
-    public function Sctgr(Request $request,$mctgr="",$prdnm="",$page=0,$limit=10){
+    public function Lctgr(Request $request,$keywords=""){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'size' =>0,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            "common"=>[
+                                "prd_nm"=>[
+                                    "query"=> $keywords,
+                                    "cutoff_frequency"=> 0.0001
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_nm"=> [
+                        "terms"=> [
+                            "field"=> "lctgr_nm.keyword"
+                        ]
+                    ],
+                    "group_by_no"=> [
+                        "terms"=> [
+                            "field"=> "lctgr_no"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function searchByLctgr(Request $request,$keyword="",$keyword_lct="",$page=0,$limit=10){
 
         $params = [
             'index' => 'oracle-prod',
@@ -202,19 +273,19 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' =>[
+                        'must' => [
                             [
                                 "common"=>[
-                                    "mctgr_nm"=>[
-                                        "query"=> $mctgr,
+                                    "prd_nm"=>[
+                                        "query"=> $keyword,
                                         "cutoff_frequency"=> 1.0
                                     ]
                                 ]
                             ],
                             [
                                 "common"=>[
-                                    "prd_nm"=>[
-                                        "query"=> $prdnm,
+                                    "lctgr_nm"=>[
+                                        "query"=> $keyword_lct,
                                         "cutoff_frequency"=> 1.0
                                     ]
                                 ]
@@ -223,9 +294,72 @@ class ApiGetController extends BaseController
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_state"=> [
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ]
+                ],
+                'sort' => [
+                    'pop_score' => [
+                        'order' => 'desc'
+                    ]
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        $response["key"]=$keyword;
+        return $response;
+    }
+
+    public function Sctgr(Request $request,$keyword_mct="",$keyword=""){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'size' =>0,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' =>[
+                            [
+                                "common"=>[
+                                    "mctgr_nm"=>[
+                                        "query"=> $keyword_mct,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $keyword,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_nm"=> [
                         "terms"=> [
                             "field"=> "sctgr_nm.keyword"
+                        ]
+                    ],
+                    "group_by_no"=> [
+                        "terms"=> [
+                            "field"=> "sctgr_no"
                         ]
                     ]
                 ]
@@ -296,6 +430,7 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
+        $response["key"]=$keyword;
         return $response;
     }
 }
