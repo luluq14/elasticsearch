@@ -490,7 +490,7 @@ class ApiGetController extends BaseController
     public function checkSpell($keywords=""){
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'categories',
             'body' => [
                 'query' => [
                     'match' => [
@@ -515,7 +515,7 @@ class ApiGetController extends BaseController
     public function getSpell($keywords=""){
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'categories',
             'body' => [
                 'query' => [
                     'fuzzy' => [
