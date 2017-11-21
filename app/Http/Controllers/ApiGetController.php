@@ -543,7 +543,7 @@ class ApiGetController extends BaseController
         $cek= $this->checkSpell($keywords);
         $get=$this->getSpell($keywords);
 
-        if($cek['_shards']['total']==0){
+        if($cek['hits']['total']==0){
             return $get;
         }else{
             return $cek;
