@@ -95,3 +95,25 @@ Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
  * @apiSampleRequest /search/lctgr/iphone/mobile%20phone/0/10
  */
 Route::get('/search/lctgr/{keyword}/{keyword_lct}/{page}/{limit}', 'ApiGetController@searchByLctgr');
+
+/**
+ * @api {get} /lctgr-all/{keywords} List All Lctgr
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /lctgr-all/iphone
+ */
+Route::get('/lctgr-all/{keywords}', 'ApiGetController@LctgrAll');
+
+/**
+ * @api {get} /miss/{keywords} Miss Spell
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /miss/samsun
+ */
+Route::get('/miss/{keywords}', 'ApiGetController@missSpell');

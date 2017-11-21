@@ -264,6 +264,58 @@ class ApiGetController extends BaseController
         return $response;
     }
 
+    public function LctgrAll(Request $request,$keywords=""){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'size' =>0,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            "common"=>[
+                                "prd_nm"=>[
+                                    "query"=> $keywords,
+                                    "cutoff_frequency"=> 0.0001
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_lctgr"=> [
+                        "terms"=> [
+                            "field"=> "lctgr_nm.keyword"
+                        ],
+                        "aggs"=> [
+                            "group_by_mctgr"=> [
+                                "terms"=> [
+                                    "field"=> "mctgr_nm.keyword"
+                                ],
+                                "aggs"=>[
+                                    "group_by_sctgr"=> [
+                                        "terms"=> [
+                                            "field"=> "sctgr_nm.keyword"
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+
+                ]
+            ]
+        ];
+
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
     public function searchByLctgr(Request $request,$keyword="",$keyword_lct="",$page=0,$limit=10){
 
         $params = [
@@ -430,7 +482,71 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
-        $response["key"]=$keyword;
+        $response["key"]=$prdnm;
         return $response;
+    }
+
+
+    public function checkSpell($keywords=""){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'title' => [
+                            "query"=> $keywords,
+                            "operator"=> "and"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+
+    public function getSpell($keywords=""){
+
+        $params = [
+            'index' => 'oracle-prod',
+            'body' => [
+                'query' => [
+                    'fuzzy' => [
+                        'title' => [
+                            "value"=> $keywords,
+                            "boost"=> 1.0,
+                            "fuzziness"=> 1,
+                            "prefix_length"=> 0,
+                            "max_expansions"=> 100
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function missSpell(Request $request,$keywords=""){
+        $cek= $this->checkSpell($keywords);
+        $get=$this->getSpell($keywords);
+
+        if($cek['_shards']['total']==0){
+            return $get;
+        }else{
+            return $cek;
+        }
     }
 }
