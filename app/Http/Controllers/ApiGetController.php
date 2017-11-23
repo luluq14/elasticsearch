@@ -549,4 +549,140 @@ class ApiGetController extends BaseController
             return $cek;
         }
     }
+
+    public function ListBrand(Request $request,$keywords=""){
+        $params = [
+            'index' => 'oracle-prod',
+            'size' =>0,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            'common' => [
+                                'prd_nm' => [
+                                    "query"=> $keywords,
+                                    "cutoff_frequency"=> 1.0
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_lctgr"=> [
+                        "terms"=> [
+                            "field"=> "brand_nm.keyword"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function search(Request $request,$keywords=""){
+
+        $sort=$request->input('sort');
+        $order=$request->input('order');
+        $term=$request->input('term');
+        $term_key=$request->input('key');
+        $range=$request->input('range');
+        $rangemin=$request->input('rangemin');
+        $rangemax=$request->input('rangemax');
+        $brand=$request->input('brand');
+        $page=$request->input('page');
+        $limit=$request->input('limit');
+
+        $params = [
+            'index' => 'oracle-prod',
+            'from' => $page,
+            'size' =>$limit,
+            "_source"=> ["prd_no","prd_nm","brand_nm","lctgr_nm","sctgr_nm","mctgr_nm","pop_score","buy_satisfy","create_dt","sale_score","sale_score2","sel_prc"],
+            'body' => [
+                'query' => [
+                    'bool' =>[
+                        'must' =>[
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=>$keywords,
+                                        "cutoff_frequency" => 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "sel_prc"
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+
+        if(!empty($sort)) {
+            if(empty($order))$order="desc";
+            $params['body']['sort'] =
+                [
+                    'pop_score' => [
+                        'order' => $order
+                    ]
+                ];
+        }
+
+        if(!empty($range)) {
+            $params['body']['query']['bool']['must'][] =
+                [
+                    "range"=>[
+                        "sel_prc"=>[
+                            "gte"=>$rangemin,
+                            "lte" => $rangemax
+                        ]
+                    ]
+                ];
+        }
+
+        if(!empty($brand)) {
+            $params['body']['query']['bool']['should'] =
+                [
+                    "term"=>[
+                        "brand_nm"=>$brand
+                    ]
+                ];
+        }
+
+        if(count($term)>0 && count($term_key)>0 && count($term)==count($term_key)){
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][] =
+                    [
+                        "term"=> [
+                            $value =>$term_key[$key]
+                        ]
+                    ];
+            }
+
+        }
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        $response["key"]=$keywords;
+        return $response;
+    }
 }

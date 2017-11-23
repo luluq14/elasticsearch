@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 /**
- * @api {get} /search/multiple/{keywords}/{page}/{limit} Searching
+ * @api {get} /search/multiple/{keywords}/{page}/{limit} Multiple
  *
  * @apiGroup Search Get
  * @apiVersion 0.0.1
@@ -117,3 +117,25 @@ Route::get('/lctgr-all/{keywords}', 'ApiGetController@LctgrAll');
  * @apiSampleRequest /miss/samsun
  */
 Route::get('/miss/{keywords}', 'ApiGetController@missSpell');
+
+/**
+ * @api {get} /brand/{keywords} List Brand
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /brand/samsung
+ */
+Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
+
+/**
+ * @api {get} /search/{keywords} Search
+ *
+ * @apiGroup Search Get
+ * @apiVersion 0.0.1
+ *
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term[]=lctgr_nm.keyword&&key[]=Mobile+Phone+%2F+Smartwatch&&term[]=mctgr_nm.keyword&&key[]=Mobile%20Phone&&range=sel_prc&&rangemin=500000&&rangemax=1000000&&page=0&&limit=10&&brand=Asus
+ */
+Route::get('/search/{keywords}', 'ApiGetController@search');

@@ -1,6 +1,22 @@
 define({ "api": [
   {
     "type": "get",
+    "url": "/brand/{keywords}",
+    "title": "List Brand",
+    "group": "Search_Get",
+    "version": "0.0.1",
+    "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
+    "sampleRequest": [
+      {
+        "url": "/brand/samsung"
+      }
+    ],
+    "filename": "routes/web.php",
+    "groupTitle": "Search_Get",
+    "name": "GetBrandKeywords"
+  },
+  {
+    "type": "get",
     "url": "/lctgr-all/{keywords}",
     "title": "List All Lctgr",
     "group": "Search_Get",
@@ -81,6 +97,22 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/search/{keywords}",
+    "title": "Search",
+    "group": "Search_Get",
+    "version": "0.0.1",
+    "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
+    "sampleRequest": [
+      {
+        "url": "/search/samsung?sort=pop_score&&order=asc&&term[]=lctgr_nm.keyword&&key[]=Mobile+Phone+%2F+Smartwatch&&term[]=mctgr_nm.keyword&&key[]=Mobile%20Phone&&range=sel_prc&&rangemin=500000&&rangemax=1000000&&page=0&&limit=10&&brand=Asus"
+      }
+    ],
+    "filename": "routes/web.php",
+    "groupTitle": "Search_Get",
+    "name": "GetSearchKeywords"
+  },
+  {
+    "type": "get",
     "url": "/search/lctgr/{keyword}/{keyword_lct}/{page}/{limit}",
     "title": "Searching Lctgr",
     "group": "Search_Get",
@@ -114,7 +146,7 @@ define({ "api": [
   {
     "type": "get",
     "url": "/search/multiple/{keywords}/{page}/{limit}",
-    "title": "Searching",
+    "title": "Multiple",
     "group": "Search_Get",
     "version": "0.0.1",
     "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
