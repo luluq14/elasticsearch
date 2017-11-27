@@ -16,26 +16,15 @@ Route::get('/', function () {
 });
 
 /**
- * @api {get} /search/multiple/{keywords}/{page}/{limit} Multiple
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/multiple/iphone/0/10
- */
-Route::get('/search/multiple/{keywords}/{page}/{limit}', 'ApiGetController@multiple');
-
-/**
- * @api {get} /mctgr/{keyword_lct}/{keyword} List Mctgr
+ * @api {get} /mctgr/{keyword} List Mctgr
  *
  * @apiGroup Search Get
  * @apiVersion 0.0.1
  *
  * @apiDescription {keyword} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /mctgr/mobile%20phone/samsung
+ * @apiSampleRequest /mctgr/samsung?term=[359,390]
  */
-Route::get('/mctgr/{keyword_lct}/{keyword}', 'ApiGetController@Mctgr');
+Route::get('/mctgr/{keyword}', 'ApiGetController@Mctgr');
 
 /**
  * @api {get} /search/mctgr/{prdnm}/{mctgr}/{page}/{limit} Searching Mctgr
@@ -50,16 +39,15 @@ Route::get('/mctgr/{keyword_lct}/{keyword}', 'ApiGetController@Mctgr');
 Route::get('/search/mctgr/{prdnm}/{mctgr}/{page}/{limit}', 'ApiGetController@searchByMctgr');
 
 /**
- * @api {get} /sctgr/{keyword_mct}/{keyword} List Sctgr
+ * @api {get} /sctgr/{keywords} List Sctgr
  *
  * @apiGroup Search Get
  * @apiVersion 0.0.1
  *
- * @apiDescription {mctgr} type string, not empty parameter {mctgr} to search document
- * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
- * @apiSampleRequest /sctgr/mobile%20phone/samsung
+ * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
+ * @apiSampleRequest /sctgr/samsung?term=[363,5047]
  */
-Route::get('/sctgr/{keyword_mct}/{keyword}', 'ApiGetController@Sctgr');
+Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
 
 /**
  * @api {get} /search/sctgr/{prdnm}/{sctgr}/{page}/{limit} Searching Sctgr
@@ -97,17 +85,6 @@ Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
 Route::get('/search/lctgr/{keyword}/{keyword_lct}/{page}/{limit}', 'ApiGetController@searchByLctgr');
 
 /**
- * @api {get} /lctgr-all/{keywords} List All Lctgr
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /lctgr-all/iphone
- */
-Route::get('/lctgr-all/{keywords}', 'ApiGetController@LctgrAll');
-
-/**
  * @api {get} /miss/{keywords} Miss Spell
  *
  * @apiGroup Search Get
@@ -136,6 +113,6 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term[]=lctgr_nm.keyword&&key[]=Mobile+Phone+%2F+Smartwatch&&term[]=mctgr_nm.keyword&&key[]=Mobile%20Phone&&range=sel_prc&&rangemin=500000&&rangemax=1000000&&page=0&&limit=10&&brand=Asus
+ * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term={"lctgr_nm.keyword":"Mobile Phone / Smartwatch","mctgr_nm.keyword":"Mobile Phone","sctgr_nm.keyword":"Handphone Android"}&&range={"sel_prc":"500000"}&&filter={"free_shipping_yn.keyword":"Y","app_cdt_free_yn.keyword":"Y"}&&page=0&&limit=10&&brand=xiaomi
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');

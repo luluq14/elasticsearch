@@ -26,92 +26,8 @@ class ApiGetController extends BaseController
         ];
     }
 
-    public function multiple(Request $request,$keywords="",$page=0,$limit=10){
-
-        $multi=[
-            "common"=>[
-                "prd_nm"=>[
-                    "query"=>$keywords,
-                    "cutoff_frequency" => 1.0
-                ]
-            ],
-        ];
-
-        if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
-            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords))
-            || (preg_match('/tempered glass /',$keywords)) || (preg_match('/ tempered glass /',$keywords))
-            || (preg_match('/baterai /',$keywords)) || (preg_match('/ baterai /',$keywords))
-            || (preg_match('/anti gores /',$keywords)) || (preg_match('/ anti gores /',$keywords))
-            || (preg_match('/screen protector /',$keywords)) || (preg_match('/ screen protector /',$keywords))
-            || (preg_match('/charger /',$keywords)) || (preg_match('/ charger /',$keywords))
-            || (preg_match('/sparepart /',$keywords)) || (preg_match('/ sparepart /',$keywords))
-            || (preg_match('/kabel data /',$keywords)) || (preg_match('/ kabel data /',$keywords))
-            || (preg_match('/powerbank /',$keywords)) || (preg_match('/ powerbank /',$keywords))
-            || (preg_match('/stand handphone /',$keywords)) || (preg_match('/ stand handphone /',$keywords))
-            || (preg_match('/tongsis /',$keywords)) || (preg_match('/ tongsis /',$keywords))
-            || (preg_match('/lensa handphone /',$keywords)) || (preg_match('/ lensa handphone /',$keywords))
-
-        ){
-            $hasil=[
-                'must' =>$multi,
-            ];
-        }else{
-            $hasil=[
-                'must' =>$multi,
-                'must_not'=>[
-                    "common"=>[
-                        "mctgr_nm"=>[
-                            "query"=>"Aksesoris",
-                            "cutoff_frequency"=> 1.0
-                        ]
-                    ]
-                ]
-            ];
-        }
-
-//        print_r($hasil);die();
-
-        $params = [
-            'index' => 'oracle-prod',
-            'from' => $page,
-            'size' =>$limit,
-            'body' => [
-                'sort' => [
-                    'pop_score' => [
-                        'order' => 'desc'
-                    ]
-                ],
-                'min_score'=>1.0,
-                'query' => [
-                    'bool' => $hasil
-                ],
-                'aggs' =>[
-                    "max_price"=> [
-                        "max"=> [
-                            "field"=> "sel_prc"
-                        ]
-                    ],
-                    "min_price"=> [
-                        "min"=> [
-                            "field"=> "sel_prc"
-                        ]
-                    ]
-                ],
-            ]
-        ];
-
-
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        $response["key"]=$keywords;
-        return $response;
-    }
-
-    public function Mctgr(Request $request,$keyword_lct="",$keyword=""){
-
+    public function Mctgr(Request $request,$keyword=""){
+        $term=$request->input('term');
         $params = [
             'index' => 'oracle-prod',
             'size' =>0,
@@ -119,14 +35,6 @@ class ApiGetController extends BaseController
                 'query' => [
                     'bool' => [
                         'must' =>[
-                            [
-                                "common"=>[
-                                    "lctgr_nm"=>[
-                                        "query"=> $keyword_lct,
-                                        "cutoff_frequency"=> 1.0
-                                    ]
-                                ]
-                            ],
                             [
                                 "common"=>[
                                     "prd_nm"=>[
@@ -139,20 +47,34 @@ class ApiGetController extends BaseController
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_nm"=> [
-                        "terms"=> [
-                            "field"=> "mctgr_nm.keyword"
-                        ]
-                    ],
                     "group_by_no"=> [
                         "terms"=> [
                             "field"=> "mctgr_no"
+                        ],
+                        "aggs"=> [
+                            "tops"=> [
+                                "top_hits"=>[
+                                    "_source"=> ["lctgr_no","lctgr_nm","mctgr_no","mctgr_nm"],
+                                    "size" => 1
+                                ]
+                            ]
                         ]
                     ]
                 ]
             ]
         ];
 
+        if(!empty($term)){
+            $new_terms=json_decode($term);
+            foreach ($new_terms as $key => $value){
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "term"=> [
+                            "lctgr_no" =>$value
+                        ]
+                    ];
+            }
+        }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
@@ -241,68 +163,34 @@ class ApiGetController extends BaseController
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_nm"=> [
-                        "terms"=> [
-                            "field"=> "lctgr_nm.keyword"
-                        ]
-                    ],
-                    "group_by_no"=> [
-                        "terms"=> [
-                            "field"=> "lctgr_no"
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        return $response;
-    }
-
-    public function LctgrAll(Request $request,$keywords=""){
-
-        $params = [
-            'index' => 'oracle-prod',
-            'size' =>0,
-            'body' => [
-                'query' => [
-                    'bool' => [
-                        'must' => [
-                            "common"=>[
-                                "prd_nm"=>[
-                                    "query"=> $keywords,
-                                    "cutoff_frequency"=> 0.0001
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'aggs' =>[
                     "group_by_lctgr"=> [
                         "terms"=> [
-                            "field"=> "lctgr_nm.keyword"
+                            "field"=> "lctgr_no"
                         ],
                         "aggs"=> [
                             "group_by_mctgr"=> [
                                 "terms"=> [
-                                    "field"=> "mctgr_nm.keyword"
+                                    "field"=> "mctgr_no"
                                 ],
-                                "aggs"=>[
+                                "aggs"=> [
                                     "group_by_sctgr"=> [
                                         "terms"=> [
-                                            "field"=> "sctgr_nm.keyword"
+                                            "field"=> "sctgr_no"
+                                        ],
+                                        "aggs"=> [
+                                            "tops"=> [
+                                                "top_hits"=> [
+                                                    "_source"=> ["lctgr_no","lctgr_nm","mctgr_no","mctgr_nm","sctgr_no","sctgr_nm"],
+                                                    "size" => 1
+                                                ]
+                                            ]
                                         ]
                                     ]
                                 ]
                             ]
+
                         ]
                     ]
-
                 ]
             ]
         ];
@@ -375,7 +263,8 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-    public function Sctgr(Request $request,$keyword_mct="",$keyword=""){
+    public function Sctgr(Request $request,$keyword=""){
+        $term=$request->input('term');
 
         $params = [
             'index' => 'oracle-prod',
@@ -384,14 +273,6 @@ class ApiGetController extends BaseController
                 'query' => [
                     'bool' => [
                         'must' =>[
-                            [
-                                "common"=>[
-                                    "mctgr_nm"=>[
-                                        "query"=> $keyword_mct,
-                                        "cutoff_frequency"=> 1.0
-                                    ]
-                                ]
-                            ],
                             [
                                 "common"=>[
                                     "prd_nm"=>[
@@ -404,20 +285,34 @@ class ApiGetController extends BaseController
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_nm"=> [
-                        "terms"=> [
-                            "field"=> "sctgr_nm.keyword"
-                        ]
-                    ],
                     "group_by_no"=> [
                         "terms"=> [
                             "field"=> "sctgr_no"
+                        ],
+                        'aggs' =>[
+                            "tops"=> [
+                                "top_hits"=> [
+                                    "_source"=> ["mctgr_no","mctgr_nm","sctgr_no","sctgr_nm"],
+                                    "size" => 1
+                                ]
+                            ]
                         ]
                     ]
                 ]
             ]
         ];
 
+        if(!empty($term)){
+            $new_terms=json_decode($term);
+            foreach ($new_terms as $key => $value){
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "term"=> [
+                            "mctgr_no" =>$value
+                        ]
+                    ];
+            }
+        }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
@@ -511,8 +406,7 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-
-    public function getSpell($keywords=""){
+    public function checkSpell2($keywords=""){
 
         $params = [
             'index' => 'categories',
@@ -524,7 +418,37 @@ class ApiGetController extends BaseController
                             "boost"=> 1.0,
                             "fuzziness"=> 1,
                             "prefix_length"=> 0,
-                            "max_expansions"=> 100
+                            "max_expansions"=> 50
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function getSpell($keywords=""){
+
+        $params = [
+            'index' => 'categories',
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            [
+                                "common"=> [
+                                    "title"=>[
+                                        "query"=>$keywords,
+                                        "cutoff_frequency"=> 0.9
+                                    ]
+                                ]
+                            ]
                         ]
                     ]
                 ]
@@ -541,10 +465,15 @@ class ApiGetController extends BaseController
 
     public function missSpell(Request $request,$keywords=""){
         $cek= $this->checkSpell($keywords);
+        $cek2= $this->checkSpell2($keywords);
         $get=$this->getSpell($keywords);
 
         if($cek['hits']['total']==0){
-            return $get;
+            if($cek2['hits']['total']==0){
+                return $get;
+            }else{
+                return $cek2;
+            }
         }else{
             return $cek;
         }
@@ -590,10 +519,8 @@ class ApiGetController extends BaseController
         $sort=$request->input('sort');
         $order=$request->input('order');
         $term=$request->input('term');
-        $term_key=$request->input('key');
         $range=$request->input('range');
-        $rangemin=$request->input('rangemin');
-        $rangemax=$request->input('rangemax');
+        $filter=$request->input('filter');
         $brand=$request->input('brand');
         $page=$request->input('page');
         $limit=$request->input('limit');
@@ -605,17 +532,44 @@ class ApiGetController extends BaseController
             "_source"=> ["prd_no","prd_nm","brand_nm","lctgr_nm","sctgr_nm","mctgr_nm","pop_score","buy_satisfy","create_dt","sale_score","sale_score2","sel_prc"],
             'body' => [
                 'query' => [
-                    'bool' =>[
-                        'must' =>[
-                            [
-                                "common"=>[
-                                    "prd_nm"=>[
-                                        "query"=>$keywords,
-                                        "cutoff_frequency" => 1.0
+                    'function_score' =>[
+                        'query'=>[
+                            'bool'=>[
+                                'must' =>[
+                                    [
+                                        "common"=>[
+                                            "prd_nm"=>[
+                                                "query"=>$keywords,
+                                                "cutoff_frequency" => 1.0
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
-                        ]
+                        ],
+                        "boost" => "5",
+                        "functions"=>[
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>360
+                                    ]
+                                ],
+                                "weight"=>5
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>3691
+                                    ]
+                                ],
+                                "weight"=>5
+                            ]
+                        ],
+                        "max_boost"=>10,
+                        "score_mode"=> "max",
+                        "boost_mode"=>"multiply",
+                        "min_score" => 1
                     ]
                 ],
                 'aggs' =>[
@@ -645,19 +599,21 @@ class ApiGetController extends BaseController
         }
 
         if(!empty($range)) {
-            $params['body']['query']['bool']['must'][] =
-                [
-                    "range"=>[
-                        "sel_prc"=>[
-                            "gte"=>$rangemin,
-                            "lte" => $rangemax
+            $range = json_decode($range, true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                    [
+                        "range" => [
+                            $key => [
+                                "gte" => $value
+                            ]
                         ]
-                    ]
-                ];
+                    ];
+            }
         }
 
         if(!empty($brand)) {
-            $params['body']['query']['bool']['should'] =
+            $params['body']['query']['function_score']['query']['bool']['should'] =
                 [
                     "term"=>[
                         "brand_nm"=>$brand
@@ -665,17 +621,31 @@ class ApiGetController extends BaseController
                 ];
         }
 
-        if(count($term)>0 && count($term_key)>0 && count($term)==count($term_key)){
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "term" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][] =
+                $params['body']['query']['function_score']['query']['bool']['must'][] =
                     [
                         "term"=> [
-                            $value =>$term_key[$key]
+                            $key =>$value
                         ]
                     ];
             }
 
         }
+
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
