@@ -514,8 +514,6 @@ class ApiGetController extends BaseController
         $order=$request->input('order');
         $term=$request->input('terms');
         $range=$request->input('range');
-        $gte=$request->input('gte');
-        $lte=$request->input('lte');
         $filter=$request->input('filter');
         $should=$request->input('should');
         $page=$request->input('page');
@@ -594,15 +592,16 @@ class ApiGetController extends BaseController
         }
 
         if(!empty($range)) {
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['function_score']['query']['bool']['must']['range'][] =
                     [
-                        "range" => [
-                            $range => [
-                                "gte" => $gte,
-                                "lte" => $lte,
-                            ]
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
                         ]
                     ];
+            }
         }
 
         if(!empty($should)) {
