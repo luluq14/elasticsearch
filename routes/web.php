@@ -22,7 +22,7 @@ Route::get('/', function () {
  * @apiVersion 0.0.1
  *
  * @apiDescription {keyword} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /mctgr/samsung?term=[359,390]
+ * @apiSampleRequest /mctgr/samsung?terms={"lctgr_no":"359,390"}
  */
 Route::get('/mctgr/{keyword}', 'ApiGetController@Mctgr');
 
@@ -45,7 +45,7 @@ Route::get('/search/mctgr/{prdnm}/{mctgr}/{page}/{limit}', 'ApiGetController@sea
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /sctgr/samsung?term=[363,5047]
+ * @apiSampleRequest /sctgr/samsung?terms={"mctgr_no":"363,5047"}
  */
 Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
 
@@ -113,6 +113,6 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term={"lctgr_nm.keyword":"Mobile Phone / Smartwatch","mctgr_nm.keyword":"Mobile Phone","sctgr_nm.keyword":"Handphone Android"}&&range={"sel_prc":"500000"}&&filter={"free_shipping_yn.keyword":"Y","app_cdt_free_yn.keyword":"Y"}&&page=0&&limit=10&&brand=xiaomi
+ * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term={"lctgr_nm.keyword":"Mobile Phone / Smartwatch","mctgr_nm.keyword":"Mobile Phone","sctgr_nm.keyword":"Handphone Android"}&&range={"sel_prc":"500000"}&&filter={"free_shipping_yn.keyword":"Y","app_cdt_free_yn.keyword":"Y"}&&page=0&&limit=10&&brand="xiaomi,asus"
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');

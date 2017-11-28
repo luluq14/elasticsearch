@@ -28,6 +28,7 @@ class ApiGetController extends BaseController
 
     public function Mctgr(Request $request,$keyword=""){
         $term=$request->input('term');
+
         $params = [
             'index' => 'oracle-prod',
             'size' =>0,
@@ -65,12 +66,12 @@ class ApiGetController extends BaseController
         ];
 
         if(!empty($term)){
-            $new_terms=json_decode($term);
+            $new_terms=json_decode($term,true);
             foreach ($new_terms as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][] =
                     [
-                        "term"=> [
-                            "lctgr_no" =>$value
+                        "terms"=> [
+                            $key =>explode(',',$value)
                         ]
                     ];
             }
@@ -292,7 +293,7 @@ class ApiGetController extends BaseController
                         'aggs' =>[
                             "tops"=> [
                                 "top_hits"=> [
-                                    "_source"=> ["mctgr_no","mctgr_nm","sctgr_no","sctgr_nm"],
+                                    "_source"=> ["lctgr_no","lctgr_nm","mctgr_no","mctgr_nm","sctgr_no","sctgr_nm"],
                                     "size" => 1
                                 ]
                             ]
@@ -305,10 +306,10 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $new_terms=json_decode($term);
             foreach ($new_terms as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][] =
                     [
-                        "term"=> [
-                            "mctgr_no" =>$value
+                        "terms"=> [
+                            $key =>explode(',',$value)
                         ]
                     ];
             }
@@ -615,8 +616,8 @@ class ApiGetController extends BaseController
         if(!empty($brand)) {
             $params['body']['query']['function_score']['query']['bool']['should'] =
                 [
-                    "term"=>[
-                        "brand_nm"=>$brand
+                    "terms"=>[
+                        "brand_nm"=>explode(',',$brand)
                     ]
                 ];
         }
@@ -626,8 +627,8 @@ class ApiGetController extends BaseController
             foreach ($filter as $key => $value) {
                 $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
-                        "term" => [
-                            $key => $value
+                        "terms" => [
+                            $key => explode(',',$value)
                         ]
                     ];
             }
@@ -638,8 +639,8 @@ class ApiGetController extends BaseController
             foreach ($term as $key => $value){
                 $params['body']['query']['function_score']['query']['bool']['must'][] =
                     [
-                        "term"=> [
-                            $key =>$value
+                        "terms"=> [
+                            $key =>explode(',',$value)
                         ]
                     ];
             }

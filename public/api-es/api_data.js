@@ -40,7 +40,7 @@ define({ "api": [
     "description": "<p>{keyword} type string, not empty parameter {keywords} to search document</p>",
     "sampleRequest": [
       {
-        "url": "/mctgr/samsung?term=[359,390]"
+        "url": "/mctgr/samsung?terms={\"lctgr_no\":\"359,390\"}"
       }
     ],
     "filename": "routes/web.php",
@@ -72,7 +72,7 @@ define({ "api": [
     "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
     "sampleRequest": [
       {
-        "url": "/sctgr/samsung?term=[363,5047]"
+        "url": "/sctgr/samsung?terms={\"mctgr_no\":\"363,5047\"}"
       }
     ],
     "filename": "routes/web.php",
@@ -88,7 +88,7 @@ define({ "api": [
     "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
     "sampleRequest": [
       {
-        "url": "/search/samsung?sort=pop_score&&order=asc&&term={\"lctgr_nm.keyword\":\"Mobile Phone / Smartwatch\",\"mctgr_nm.keyword\":\"Mobile Phone\",\"sctgr_nm.keyword\":\"Handphone Android\"}&&range={\"sel_prc\":\"500000\"}&&filter={\"free_shipping_yn.keyword\":\"Y\",\"app_cdt_free_yn.keyword\":\"Y\"}&&page=0&&limit=10&&brand=xiaomi"
+        "url": "/search/samsung?sort=pop_score&&order=asc&&term={\"lctgr_nm.keyword\":\"Mobile Phone / Smartwatch\",\"mctgr_nm.keyword\":\"Mobile Phone\",\"sctgr_nm.keyword\":\"Handphone Android\"}&&range={\"sel_prc\":\"500000\"}&&filter={\"free_shipping_yn.keyword\":\"Y\",\"app_cdt_free_yn.keyword\":\"Y\"}&&page=0&&limit=10&&brand=\"xiaomi,asus\""
       }
     ],
     "filename": "routes/web.php",
