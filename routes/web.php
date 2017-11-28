@@ -27,18 +27,6 @@ Route::get('/', function () {
 Route::get('/mctgr/{keyword}', 'ApiGetController@Mctgr');
 
 /**
- * @api {get} /search/mctgr/{prdnm}/{mctgr}/{page}/{limit} Searching Mctgr
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/mctgr/iphone/mobile%20phone/0/10
- */
-Route::get('/search/mctgr/{prdnm}/{mctgr}/{page}/{limit}', 'ApiGetController@searchByMctgr');
-
-/**
  * @api {get} /sctgr/{keywords} List Sctgr
  *
  * @apiGroup Search Get
@@ -48,18 +36,6 @@ Route::get('/search/mctgr/{prdnm}/{mctgr}/{page}/{limit}', 'ApiGetController@sea
  * @apiSampleRequest /sctgr/samsung?terms={"mctgr_no":"363,5047"}
  */
 Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
-
-/**
- * @api {get} /search/sctgr/{prdnm}/{sctgr}/{page}/{limit} Searching Sctgr
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
- * @apiDescription {sctgr} type string, not empty parameter {sctgr} to search document
- * @apiSampleRequest /search/sctgr/iphone%206/iphone/0/10
- */
-Route::get('/search/sctgr/{prdnm}/{sctgr}/{page}/{limit}', 'ApiGetController@SearchBySctgr');
 
 /**
  * @api {get} /lctgr/{keywords} List Lctgr
@@ -72,17 +48,6 @@ Route::get('/search/sctgr/{prdnm}/{sctgr}/{page}/{limit}', 'ApiGetController@Sea
  */
 Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
 
-/**
- * @api {get} /search/lctgr/{keyword}/{keyword_lct}/{page}/{limit} Searching Lctgr
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {prdnm} type string, not empty parameter {prdnm} to search document
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/lctgr/iphone/mobile%20phone/0/10
- */
-Route::get('/search/lctgr/{keyword}/{keyword_lct}/{page}/{limit}', 'ApiGetController@searchByLctgr');
 
 /**
  * @api {get} /miss/{keywords} Miss Spell
