@@ -486,6 +486,14 @@ class ApiGetController extends BaseController
                     "group_by_lctgr"=> [
                         "terms"=> [
                             "field"=> "brand_nm.keyword"
+                        ],
+                        'aggs' =>[
+                            "tops"=> [
+                                "top_hits"=> [
+                                    "_source"=> ["brand_nm","brand_cd"],
+                                    "size" => 1
+                                ]
+                            ]
                         ]
                     ]
                 ]
@@ -509,7 +517,7 @@ class ApiGetController extends BaseController
         $gte=$request->input('gte');
         $lte=$request->input('lte');
         $filter=$request->input('filter');
-        $brand=$request->input('brand');
+        $should=$request->input('should');
         $page=$request->input('page');
         $limit=$request->input('limit');
 
@@ -597,13 +605,16 @@ class ApiGetController extends BaseController
                     ];
         }
 
-        if(!empty($brand)) {
-            $params['body']['query']['function_score']['query']['bool']['should'] =
-                [
-                    "terms"=>[
-                        "brand_nm"=>explode(',',$brand)
-                    ]
-                ];
+        if(!empty($should)) {
+            $should=json_decode($should,true);
+            foreach ($should as $key => $value) {
+                $params['body']['query']['function_score']['query']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => explode(',', $value)
+                        ]
+                    ];
+            }
         }
 
         if(!empty($filter)) {
