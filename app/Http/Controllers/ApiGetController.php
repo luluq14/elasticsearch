@@ -332,7 +332,6 @@ class ApiGetController extends BaseController
     public function search(Request $request,$keywords=""){
 
         $sort=$request->input('sort');
-        $order=$request->input('order');
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
@@ -403,13 +402,15 @@ class ApiGetController extends BaseController
 
 
         if(!empty($sort)) {
-            if(empty($order))$order="desc";
-            $params['body']['sort'] =
-                [
-                    'pop_score' => [
-                        'order' => $order
-                    ]
-                ];
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
+                    [
+                        $key => [
+                            'order' => $value['order']
+                        ]
+                    ];
+            }
         }
 
         if(!empty($range)) {
