@@ -27,7 +27,7 @@ class ApiGetController extends BaseController
     }
 
     public function Mctgr(Request $request,$keyword=""){
-        $term=$request->input('term');
+        $term=$request->input('terms');
 
         $params = [
             'index' => 'oracle-prod',
@@ -265,7 +265,7 @@ class ApiGetController extends BaseController
     }
 
     public function Sctgr(Request $request,$keyword=""){
-        $term=$request->input('term');
+        $term=$request->input('terms');
 
         $params = [
             'index' => 'oracle-prod',
@@ -519,7 +519,7 @@ class ApiGetController extends BaseController
 
         $sort=$request->input('sort');
         $order=$request->input('order');
-        $term=$request->input('term');
+        $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
         $brand=$request->input('brand');
