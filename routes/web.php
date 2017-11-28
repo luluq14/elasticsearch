@@ -113,6 +113,6 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term={"lctgr_nm.keyword":"Mobile Phone / Smartwatch","mctgr_nm.keyword":"Mobile Phone","sctgr_nm.keyword":"Handphone Android"}&&range={"sel_prc":"500000"}&&filter={"free_shipping_yn.keyword":"Y","app_cdt_free_yn.keyword":"Y"}&&page=0&&limit=10&&brand="xiaomi,asus"
+ * @apiSampleRequest /search/samsung?sort=pop_score&&order=asc&&term={"lctgr_nm.keyword":"Mobile Phone / Smartwatch,Handphone Android","mctgr_nm.keyword":"Mobile Phone,Mobile Phone / Smartwatch","sctgr_nm.keyword":"Handphone Android"}&&range={"sel_prc":"500000"}&&filter={"free_shipping_yn.keyword":"Y","app_cdt_free_yn.keyword":"Y"}&&page=0&&limit=10&&brand="xiaomi,asus"
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');
