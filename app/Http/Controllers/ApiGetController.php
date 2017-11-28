@@ -517,7 +517,6 @@ class ApiGetController extends BaseController
             'index' => 'oracle-prod',
             'from' => $page,
             'size' =>$limit,
-            "_source"=> ["prd_no","prd_nm","brand_nm","lctgr_nm","sctgr_nm","mctgr_nm","pop_score","buy_satisfy","create_dt","sale_score","sale_score2","sel_prc"],
             'body' => [
                 'query' => [
                     'function_score' =>[
