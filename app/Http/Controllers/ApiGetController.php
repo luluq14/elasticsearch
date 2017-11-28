@@ -594,7 +594,7 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['function_score']['query']['bool']['must']['range'][] =
+                $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -641,7 +641,7 @@ class ApiGetController extends BaseController
 
         }
 
-
+//        print_r($params);die();
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
         ->build();              // Build the client object
