@@ -88,7 +88,7 @@ define({ "api": [
     "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
     "sampleRequest": [
       {
-        "url": "/search/samsung?sort=pop_score&&order=asc&&terms={\"lctgr_nm.keyword\":\"Mobile Phone / Smartwatch,Handphone Android\",\"mctgr_nm.keyword\":\"Mobile Phone,Mobile Phone / Smartwatch\",\"sctgr_nm.keyword\":\"Handphone Android\"}&&range={\"sel_prc\":\"500000\"}&&filter={\"free_shipping_yn.keyword\":\"Y\",\"app_cdt_free_yn.keyword\":\"Y\"}&&page=0&&limit=10&&brand=\"xiaomi,asus\""
+        "url": "/search/samsung?sort=pop_score&&order=asc&&terms={\"lctgr_nm.keyword\":\"Mobile Phone / Smartwatch,Handphone Android\",\"mctgr_nm.keyword\":\"Mobile Phone,Mobile Phone / Smartwatch\",\"sctgr_nm.keyword\":\"Handphone Android\"}&&range=sel_prc&&gte=500000&&lte=1000000&&filter={\"free_shipping_yn.keyword\":\"Y\",\"app_cdt_free_yn.keyword\":\"Y\"}&&page=0&&limit=10&&brand=\"xiaomi,asus\""
       }
     ],
     "filename": "routes/web.php",

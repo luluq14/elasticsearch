@@ -169,27 +169,12 @@ class ApiGetController extends BaseController
                             "field"=> "lctgr_no"
                         ],
                         "aggs"=> [
-                            "group_by_mctgr"=> [
-                                "terms"=> [
-                                    "field"=> "mctgr_no"
-                                ],
-                                "aggs"=> [
-                                    "group_by_sctgr"=> [
-                                        "terms"=> [
-                                            "field"=> "sctgr_no"
-                                        ],
-                                        "aggs"=> [
-                                            "tops"=> [
-                                                "top_hits"=> [
-                                                    "_source"=> ["lctgr_no","lctgr_nm","mctgr_no","mctgr_nm","sctgr_no","sctgr_nm"],
-                                                    "size" => 1
-                                                ]
-                                            ]
-                                        ]
-                                    ]
+                            "tops"=> [
+                                "top_hits"=> [
+                                    "_source"=> ["lctgr_no","lctgr_nm"],
+                                    "size" => 1
                                 ]
                             ]
-
                         ]
                     ]
                 ]
@@ -521,6 +506,8 @@ class ApiGetController extends BaseController
         $order=$request->input('order');
         $term=$request->input('terms');
         $range=$request->input('range');
+        $gte=$request->input('gte');
+        $lte=$request->input('lte');
         $filter=$request->input('filter');
         $brand=$request->input('brand');
         $page=$request->input('page');
@@ -600,17 +587,15 @@ class ApiGetController extends BaseController
         }
 
         if(!empty($range)) {
-            $range = json_decode($range, true);
-            foreach ($range as $key => $value) {
                 $params['body']['query']['function_score']['query']['bool']['must'][] =
                     [
                         "range" => [
-                            $key => [
-                                "gte" => $value
+                            $range => [
+                                "gte" => $gte,
+                                "lte" => $lte,
                             ]
                         ]
                     ];
-            }
         }
 
         if(!empty($brand)) {
