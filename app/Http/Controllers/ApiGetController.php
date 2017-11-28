@@ -188,7 +188,7 @@ class ApiGetController extends BaseController
         $response = $client->search($params);
         return $response;
     }
-    
+
     public function checkSpell($keywords=""){
 
         $params = [
@@ -304,7 +304,7 @@ class ApiGetController extends BaseController
                     ]
                 ],
                 'aggs' =>[
-                    "group_by_lctgr"=> [
+                    "group_by_no"=> [
                         "terms"=> [
                             "field"=> "brand_nm.keyword"
                         ],
