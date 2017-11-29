@@ -432,7 +432,7 @@ class ApiGetController extends BaseController
                 $params['body']['query']['function_score']['query']['bool']['should'][] =
                     [
                         "terms" => [
-                            $key => explode(',', $value)
+                            $key => $value
                         ]
                     ];
             }
@@ -444,7 +444,7 @@ class ApiGetController extends BaseController
                 $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
-                            $key => explode(',',$value)
+                            $key => $value
                         ]
                     ];
             }
@@ -456,14 +456,13 @@ class ApiGetController extends BaseController
                 $params['body']['query']['function_score']['query']['bool']['must'][] =
                     [
                         "terms"=> [
-                            $key =>explode(',',$value)
+                            $key =>$value
                         ]
                     ];
             }
 
         }
 
-//        print_r($params);die();
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
         ->build();              // Build the client object
