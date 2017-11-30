@@ -25,9 +25,12 @@ class ApiGetController extends BaseController
             ]
         ];
     }
-
     public function Mctgr(Request $request,$keyword=""){
+        $sort=$request->input('sort');
         $term=$request->input('terms');
+        $range=$request->input('range');
+        $filter=$request->input('filter');
+        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle-prod',
@@ -65,16 +68,66 @@ class ApiGetController extends BaseController
             ]
         ];
 
-        if(!empty($term)){
-            $new_terms=json_decode($term,true);
-            foreach ($new_terms as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][] =
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
                     [
-                        "terms"=> [
-                            $key =>explode(',',$value)
+                        $key => [
+                            'order' => $value['order']
                         ]
                     ];
             }
+        }
+
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($should)) {
+            $should=json_decode($should,true);
+            foreach ($should as $key => $value) {
+                $params['body']['query']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][] =
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
         }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
@@ -86,6 +139,11 @@ class ApiGetController extends BaseController
     }
 
     public function Lctgr(Request $request,$keywords=""){
+        $sort=$request->input('sort');
+        $term=$request->input('terms');
+        $range=$request->input('range');
+        $filter=$request->input('filter');
+        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle-prod',
@@ -94,10 +152,12 @@ class ApiGetController extends BaseController
                 'query' => [
                     'bool' => [
                         'must' => [
-                            "common"=>[
-                                "prd_nm"=>[
-                                    "query"=> $keywords,
-                                    "cutoff_frequency"=> 0.0001
+                            [
+                                "common"=>[
+                                    "prd_nm"=>[
+                                        "query"=> $keywords,
+                                        "cutoff_frequency"=> 0.0001
+                                    ]
                                 ]
                             ]
                         ]
@@ -121,6 +181,67 @@ class ApiGetController extends BaseController
             ]
         ];
 
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
+                    [
+                        $key => [
+                            'order' => $value['order']
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($should)) {
+            $should=json_decode($should,true);
+            foreach ($should as $key => $value) {
+                $params['body']['query']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][] =
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
+        }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
@@ -131,7 +252,11 @@ class ApiGetController extends BaseController
     }
 
     public function Sctgr(Request $request,$keyword=""){
+        $sort=$request->input('sort');
         $term=$request->input('terms');
+        $range=$request->input('range');
+        $filter=$request->input('filter');
+        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle-prod',
@@ -169,16 +294,66 @@ class ApiGetController extends BaseController
             ]
         ];
 
-        if(!empty($term)){
-            $new_terms=json_decode($term);
-            foreach ($new_terms as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][] =
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
                     [
-                        "terms"=> [
-                            $key =>explode(',',$value)
+                        $key => [
+                            'order' => $value['order']
                         ]
                     ];
             }
+        }
+
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($should)) {
+            $should=json_decode($should,true);
+            foreach ($should as $key => $value) {
+                $params['body']['query']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][] =
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
         }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
@@ -287,6 +462,12 @@ class ApiGetController extends BaseController
     }
 
     public function ListBrand(Request $request,$keywords=""){
+        $sort=$request->input('sort');
+        $term=$request->input('terms');
+        $range=$request->input('range');
+        $filter=$request->input('filter');
+        $should=$request->input('should');
+
         $params = [
             'index' => 'oracle-prod',
             'size' =>0,
@@ -294,10 +475,12 @@ class ApiGetController extends BaseController
                 'query' => [
                     'bool' => [
                         'must' => [
-                            'common' => [
-                                'prd_nm' => [
-                                    "query"=> $keywords,
-                                    "cutoff_frequency"=> 1.0
+                            [
+                                'common' => [
+                                    'prd_nm' => [
+                                        "query"=> $keywords,
+                                        "cutoff_frequency"=> 1.0
+                                    ]
                                 ]
                             ]
                         ]
@@ -320,6 +503,68 @@ class ApiGetController extends BaseController
                 ]
             ]
         ];
+
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
+                    [
+                        $key => [
+                            'order' => $value['order']
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($should)) {
+            $should=json_decode($should,true);
+            foreach ($should as $key => $value) {
+                $params['body']['query']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][] =
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
+        }
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts

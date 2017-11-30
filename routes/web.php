@@ -22,7 +22,7 @@ Route::get('/', function () {
  * @apiVersion 0.0.1
  *
  * @apiDescription {keyword} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /mctgr/samsung?terms={"lctgr_no":"359,390"}
+ * @apiSampleRequest /mctgr/samsung?terms={"lctgr_no":["359"]}
  */
 Route::get('/mctgr/{keyword}', 'ApiGetController@Mctgr');
 
@@ -33,7 +33,7 @@ Route::get('/mctgr/{keyword}', 'ApiGetController@Mctgr');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /sctgr/samsung?terms={"mctgr_no":"363,5047"}
+ * @apiSampleRequest /sctgr/samsung?terms={"mctgr_no":["363","5047"]}
  */
 Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
 
