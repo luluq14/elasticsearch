@@ -33,7 +33,7 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'oracle',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -146,7 +146,7 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'oracle',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -259,7 +259,7 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'oracle',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -371,7 +371,7 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'match' => [
-                        'title' => [
+                        'keyword' => [
                             "query"=> $keywords,
                             "operator"=> "and"
                         ]
@@ -395,7 +395,7 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'fuzzy' => [
-                        'title' => [
+                        'keyword' => [
                             "value"=> $keywords,
                             "boost"=> 1.0,
                             "fuzziness"=> 1,
@@ -425,7 +425,7 @@ class ApiGetController extends BaseController
                         'must' => [
                             [
                                 "common"=> [
-                                    "title"=>[
+                                    "keyword"=>[
                                         "query"=>$keywords,
                                         "cutoff_frequency"=> 0.9
                                     ]
@@ -469,7 +469,7 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'oracle',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -585,7 +585,7 @@ class ApiGetController extends BaseController
         $limit=$request->input('limit');
 
         $params = [
-            'index' => 'oracle-prod',
+            'index' => 'oracle',
             'from' => $page,
             'size' =>$limit,
             'body' => [
