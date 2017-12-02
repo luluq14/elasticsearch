@@ -367,7 +367,7 @@ class ApiGetController extends BaseController
     public function checkSpell($keywords=""){
 
         $params = [
-            'index' => 'oztmt-nes',
+            'index' => 'oztmt-new',
             'body' => [
                 'query' => [
                     'match' => [
@@ -391,17 +391,11 @@ class ApiGetController extends BaseController
     public function checkSpell2($keywords=""){
 
         $params = [
-            'index' => 'oztmt-nes',
+            'index' => 'oztmt-new',
             'body' => [
                 'query' => [
                     'fuzzy' => [
-                        'keyword' => [
-                            "value"=> $keywords,
-                            "boost"=> 1.0,
-                            "fuzziness"=> 1,
-                            "prefix_length"=> 0,
-                            "max_expansions"=> 50
-                        ]
+                        'keyword' =>  $keywords,
                     ]
                 ]
             ]
@@ -418,7 +412,7 @@ class ApiGetController extends BaseController
     public function getSpell($keywords=""){
 
         $params = [
-            'index' => 'oztmt-nes',
+            'index' => 'oztmt-new',
             'body' => [
                 'query' => [
                     'bool' => [
