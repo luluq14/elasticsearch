@@ -368,6 +368,7 @@ class ApiGetController extends BaseController
 
         $params = [
             'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
             'body' => [
                 'query' => [
                     'match' => [
@@ -392,6 +393,7 @@ class ApiGetController extends BaseController
 
         $params = [
             'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
             'body' => [
                 'query' => [
                     'fuzzy' => [
@@ -413,6 +415,7 @@ class ApiGetController extends BaseController
 
         $params = [
             'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
             'body' => [
                 'query' => [
                     'bool' => [
@@ -446,13 +449,20 @@ class ApiGetController extends BaseController
 
         if($cek['hits']['total']==0){
             if($cek2['hits']['total']==0){
-                return $get;
+                $data=$get;
             }else{
-                return $cek2;
+                $data=$cek2;
             }
         }else{
-            return $cek;
+            $data=$cek;
         }
+        if(count($data['hits']['hits'])>0){
+            foreach ($data['hits']['hits'] as $key => $value){
+                $data['hits']['hits'][$key]['_source']['title']=$value['_source']['keyword'];
+                unset( $data['hits']['hits'][$key]['_source']['keyword']);
+            }
+        }
+        return $data;
     }
 
     public function ListBrand(Request $request,$keywords=""){
