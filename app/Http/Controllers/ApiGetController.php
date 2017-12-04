@@ -637,12 +637,12 @@ class ApiGetController extends BaseController
                 'aggs' =>[
                     "max_price"=> [
                         "max"=> [
-                            "field"=> "sel_prc"
+                            "field"=> "final_dsc_prc"
                         ]
                     ],
                     "min_price"=> [
                         "min"=> [
-                            "field"=> "sel_prc"
+                            "field"=> "final_dsc_prc"
                         ]
                     ]
                 ],
