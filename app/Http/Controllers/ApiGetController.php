@@ -585,7 +585,7 @@ class ApiGetController extends BaseController
     }
 
 
-    public function search(Request $request,$keywords=""){
+    public function search(Request $request,$keyword=""){
 
         $sort=$request->input('sort');
         $term=$request->input('terms');
@@ -595,8 +595,8 @@ class ApiGetController extends BaseController
         $page=$request->input('page');
         $limit=$request->input('limit');
 
-        $keywords=$this->replace($keywords);
-        $suggest=$this->cek($keywords);
+        $keywords=$this->replace($keyword);
+        $suggest=$this->cek($keyword);
 
         $params = [
             'index' => 'oracle',
@@ -727,7 +727,8 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
-        $response["key"]=$keywords;
+        $response["key"]=$keyword;
+        $response["correct"]=$keywords;
         $response["suggest"]=$suggest;
         return $response;
     }
@@ -869,15 +870,27 @@ class ApiGetController extends BaseController
 
     public function replace($keywords=""){
         $params = [
-            'index' => 'correct-key',
+            'index' => 'correct-key-new',
             '_source'=> 'correct',
             'from' =>0,
             'size' =>1,
             'body' => [
                 'query' => [
-                    'match' => [
-                        'error' => [
-                          "query"=>$keywords
+                    'bool' => [
+                        'should' => [
+                            [
+                              "term"=>[
+                                  "error"=>[
+                                      "value"=> $keywords,
+                                      "boost"=> 2.0
+                                  ]
+                              ]
+                            ],
+                            [
+                                "term"=>[
+                                    "status"=>"normal"
+                                ]
+                            ]
                         ]
                     ]
                 ]
