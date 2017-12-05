@@ -584,47 +584,7 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-    public function suggest(Request $request,$keywords=""){
-        $params = [
-            'index' => 'oztmt-new',
-            '_source'=> ['keyword'],
-            'from' =>0,
-            'size' =>3,
-            'body' => [
-                'query' => [
-                    'bool' => [
-                        'must' => [
-                            [
-                                "common"=> [
-                                    "keyword"=>[
-                                        "query"=>$keywords,
-                                        "cutoff_frequency"=> 0.9
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
 
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        return $response;
-    }
-
-
-    public function regexSearch($keywords){
-
-        if ((preg_match('/ipone/',$keywords))){
-            $keywords="iphone";
-        }
-
-        return $keywords;
-    }
     public function search(Request $request,$keywords=""){
 
         $sort=$request->input('sort');
@@ -635,8 +595,7 @@ class ApiGetController extends BaseController
         $page=$request->input('page');
         $limit=$request->input('limit');
 
-        $keywords=$this->regexSearch($keywords);
-
+        $keywords=$this->cek($keywords);
         $params = [
             'index' => 'oracle',
             'from' => $page,
@@ -768,5 +727,140 @@ class ApiGetController extends BaseController
         $response = $client->search($params);
         $response["key"]=$keywords;
         return $response;
+    }
+
+
+    public function checkSuggest($keywords=""){
+
+        $params = [
+            'index' => 'oztmt-new',
+            'from' =>0,
+            'size' =>3,
+            '_source'=> ['keyword'],
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'keyword' => [
+                            "query"=> $keywords,
+                            "operator"=> "and"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function checkSuggest2($keywords=""){
+
+        $params = [
+            'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
+            'from' =>0,
+            'size' =>3,
+            'body' => [
+                'query' => [
+                    'fuzzy' => [
+                        'keyword' =>  $keywords,
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function getSuggest($keywords=""){
+
+        $params = [
+            'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
+            'from' =>0,
+            'size' =>3,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            [
+                                "common"=> [
+                                    "keyword"=>[
+                                        "query"=>$keywords,
+                                        "cutoff_frequency"=> 0.9
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function suggest(Request $request,$keywords=""){
+        $cek= $this->checkSuggest($keywords);
+        $cek2= $this->checkSuggest2($keywords);
+        $get=$this->getSuggest($keywords);
+
+        if($cek['hits']['total']==0){
+            if($cek2['hits']['total']==0){
+                $data=$get;
+            }else{
+                $data=$cek2;
+            }
+        }else{
+            $data=$cek;
+        }
+        if(count($data['hits']['hits'])>0){
+            $keyw=[];
+            foreach ($data['hits']['hits'] as $key => $value){
+               $keyw[]=$value['_source']['keyword'];
+            }
+            $data['hits']['hits'][0]['_source']['suggest']=$keyw;
+            unset( $data['hits']['hits'][0]['_source']['keyword']);
+            return  $data['hits']['hits'][0];
+        }
+        return  $data;
+    }
+
+    public function cek($keywords=""){
+        $cek= $this->checkSuggest($keywords);
+        $cek2= $this->checkSuggest2($keywords);
+        $get=$this->getSuggest($keywords);
+
+        if($cek['hits']['total']==0){
+            if($cek2['hits']['total']==0){
+                $data=$get;
+            }else{
+                $data=$cek2;
+            }
+        }else{
+            $data=$cek;
+        }
+        if(count($data['hits']['hits'])>0){
+            $keyw=[];
+            foreach ($data['hits']['hits'] as $key => $value){
+                $keyw[]=$value['_source']['keyword'];
+            }
+            return  $keyw[0];
+        }
+        return $keywords;
     }
 }
