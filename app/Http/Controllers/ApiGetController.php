@@ -368,6 +368,8 @@ class ApiGetController extends BaseController
 
         $params = [
             'index' => 'oztmt-new',
+            'from' =>0,
+            'size' =>10,
             '_source'=> ['keyword'],
             'body' => [
                 'query' => [
@@ -394,6 +396,8 @@ class ApiGetController extends BaseController
         $params = [
             'index' => 'oztmt-new',
             '_source'=> ['keyword'],
+            'from' =>0,
+            'size' =>10,
             'body' => [
                 'query' => [
                     'fuzzy' => [
@@ -416,6 +420,8 @@ class ApiGetController extends BaseController
         $params = [
             'index' => 'oztmt-new',
             '_source'=> ['keyword'],
+            'from' =>0,
+            'size' =>10,
             'body' => [
                 'query' => [
                     'bool' => [
@@ -578,6 +584,47 @@ class ApiGetController extends BaseController
         return $response;
     }
 
+    public function suggest(Request $request,$keywords=""){
+        $params = [
+            'index' => 'oztmt-new',
+            '_source'=> ['keyword'],
+            'from' =>0,
+            'size' =>3,
+            'body' => [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            [
+                                "common"=> [
+                                    "keyword"=>[
+                                        "query"=>$keywords,
+                                        "cutoff_frequency"=> 0.9
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+
+    public function regexSearch($keywords){
+
+        if ((preg_match('/ipone/',$keywords))){
+            $keywords="iphone";
+        }
+
+        return $keywords;
+    }
     public function search(Request $request,$keywords=""){
 
         $sort=$request->input('sort');
@@ -587,6 +634,8 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
         $page=$request->input('page');
         $limit=$request->input('limit');
+
+        $keywords=$this->regexSearch($keywords);
 
         $params = [
             'index' => 'oracle',
