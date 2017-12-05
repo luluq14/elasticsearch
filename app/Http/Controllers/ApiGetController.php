@@ -595,7 +595,9 @@ class ApiGetController extends BaseController
         $page=$request->input('page');
         $limit=$request->input('limit');
 
-        $keywords=$this->cek($keywords);
+        $keywords=$this->replace($keywords);
+        $suggest=$this->cek($keywords);
+
         $params = [
             'index' => 'oracle',
             'from' => $page,
@@ -726,6 +728,7 @@ class ApiGetController extends BaseController
 
         $response = $client->search($params);
         $response["key"]=$keywords;
+        $response["suggest"]=$suggest;
         return $response;
     }
 
@@ -859,8 +862,37 @@ class ApiGetController extends BaseController
             foreach ($data['hits']['hits'] as $key => $value){
                 $keyw[]=$value['_source']['keyword'];
             }
-            return  $keyw[0];
+            return  $keyw;
         }
+        return $keywords;
+    }
+
+    public function replace($keywords=""){
+        $params = [
+            'index' => 'correct-key',
+            '_source'=> 'correct',
+            'from' =>0,
+            'size' =>1,
+            'body' => [
+                'query' => [
+                    'match' => [
+                        'error' => [
+                          "query"=>$keywords
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        if(count($response['hits']['hits'])>0){
+            return $response['hits']['hits'][0]['_source']['correct'];
+        }
+
         return $keywords;
     }
 }

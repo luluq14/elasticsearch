@@ -94,21 +94,5 @@ define({ "api": [
     "filename": "routes/web.php",
     "groupTitle": "Search_Get",
     "name": "GetSearchKeywords"
-  },
-  {
-    "type": "get",
-    "url": "/suggest/{keywords}",
-    "title": "Suggest",
-    "group": "Search_Get",
-    "version": "0.0.1",
-    "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
-    "sampleRequest": [
-      {
-        "url": "/suggest/samsung"
-      }
-    ],
-    "filename": "routes/web.php",
-    "groupTitle": "Search_Get",
-    "name": "GetSuggestKeywords"
   }
 ] });
