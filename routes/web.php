@@ -78,6 +78,6 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort={"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&terms={"lctgr_nm.keyword":["Mobile Phone / Smartwatch","Handphone Android"],"mctgr_nm.keyword":["Mobile Phone","Mobile Phone / Smartwatch"],"sctgr_nm.keyword":["Handphone Android"]}&&range={"sel_prc":{"gte":"500000","lte":"1000000"},"buy_satisfy":{"gte":"0","lte":"100"}}&&filter={"free_shipping_yn.keyword":["Y"],"app_cdt_free_yn.keyword":["Y"]}&&page=0&&limit=10&&should={"brand_nm.keyword":["xiaomi","asus"],"brand_cd.keyword":["20007"]}
+ * @apiSampleRequest /search/samsung?sort={"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&terms={"lctgr_nm.keyword":["Mobile Phone / Smartwatch","Handphone Android"],"mctgr_nm.keyword":["Mobile Phone","Mobile Phone / Smartwatch"],"sctgr_nm.keyword":["Handphone Android"]}&&range={"sel_prc":{"gte":"500000","lte":"1000000"},"buy_satisfy":{"gte":"0","lte":"100"}}&&filter={"free_shipping_yn.keyword":["Y"],"app_cdt_free_yn.keyword":["Y"]}&&page=0&&limit=10
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');
