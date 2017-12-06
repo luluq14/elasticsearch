@@ -697,7 +697,8 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
+            //    $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -735,7 +736,7 @@ class ApiGetController extends BaseController
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
 //                $params['body']['query']['function_score']['query']['bool']['must'][] =
-                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][]=
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
