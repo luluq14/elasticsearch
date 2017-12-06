@@ -636,6 +636,14 @@ class ApiGetController extends BaseController
                                     ]
                                 ],
                                 "weight"=>5
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>256
+                                    ]
+                                ],
+                                "weight"=>5
                             ]
                         ],
                         "max_boost"=>10,
