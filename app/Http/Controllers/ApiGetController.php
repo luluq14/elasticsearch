@@ -30,7 +30,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle',
@@ -38,12 +37,25 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' =>[
+                        'should' =>[
                             [
                                 "common"=>[
                                     "prd_nm"=>[
                                         "query"=> $keyword,
                                         "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "multi_match"=>[
+                                    "query"=>$keyword,
+                                    "fields"=>[
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "mem_id"
                                     ]
                                 ]
                             ]
@@ -83,23 +95,11 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
                             "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($should)) {
-            $should=json_decode($should,true);
-            foreach ($should as $key => $value) {
-                $params['body']['query']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
                         ]
                     ];
             }
@@ -120,7 +120,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -143,7 +143,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle',
@@ -151,12 +150,25 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [
+                        'should' => [
                             [
                                 "common"=>[
                                     "prd_nm"=>[
                                         "query"=> $keywords,
                                         "cutoff_frequency"=> 0.0001
+                                    ]
+                                ]
+                            ],
+                            [
+                                "multi_match"=>[
+                                    "query"=>$keywords,
+                                    "fields"=>[
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "mem_id"
                                     ]
                                 ]
                             ]
@@ -196,23 +208,11 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
                             "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($should)) {
-            $should=json_decode($should,true);
-            foreach ($should as $key => $value) {
-                $params['body']['query']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
                         ]
                     ];
             }
@@ -233,7 +233,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -256,7 +256,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle',
@@ -264,12 +263,25 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' =>[
+                        'should' =>[
                             [
                                 "common"=>[
                                     "prd_nm"=>[
                                         "query"=> $keyword,
                                         "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "multi_match"=>[
+                                    "query"=>$keyword,
+                                    "fields"=>[
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "mem_id"
                                     ]
                                 ]
                             ]
@@ -305,27 +317,14 @@ class ApiGetController extends BaseController
                     ];
             }
         }
-
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
                             "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($should)) {
-            $should=json_decode($should,true);
-            foreach ($should as $key => $value) {
-                $params['body']['query']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
                         ]
                     ];
             }
@@ -346,7 +345,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -476,7 +475,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $should=$request->input('should');
 
         $params = [
             'index' => 'oracle',
@@ -484,12 +482,25 @@ class ApiGetController extends BaseController
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [
+                        'should' => [
                             [
                                 'common' => [
                                     'prd_nm' => [
                                         "query"=> $keywords,
                                         "cutoff_frequency"=> 1.0
+                                    ]
+                                ]
+                            ],
+                            [
+                                "multi_match"=>[
+                                    "query"=>$keywords,
+                                    "fields"=>[
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "mem_id"
                                     ]
                                 ]
                             ]
@@ -529,23 +540,11 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
                             "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($should)) {
-            $should=json_decode($should,true);
-            foreach ($should as $key => $value) {
-                $params['body']['query']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
                         ]
                     ];
             }
@@ -566,7 +565,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -575,6 +574,7 @@ class ApiGetController extends BaseController
             }
 
         }
+
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
@@ -707,18 +707,6 @@ class ApiGetController extends BaseController
                     ];
             }
         }
-
-//        if(!empty($should)) {
-//            $should=json_decode($should,true);
-//            foreach ($should as $key => $value) {
-//                $params['body']['query']['function_score']['query']['bool']['should'][] =
-//                    [
-//                        "terms" => [
-//                            $key => $value
-//                        ]
-//                    ];
-//            }
-//        }
 
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
