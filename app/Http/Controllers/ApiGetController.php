@@ -594,25 +594,39 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
         $page=$request->input('page');
         $limit=$request->input('limit');
+        $from=($page-1)*$limit;
 
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
 
         $params = [
             'index' => 'oracle',
-            'from' => $page,
+            'from' => $from,
             'size' =>$limit,
             'body' => [
                 'query' => [
                     'function_score' =>[
                         'query'=>[
                             'bool'=>[
-                                'must' =>[
+                                'should' =>[
                                     [
                                         "common"=>[
                                             "prd_nm"=>[
                                                 "query"=>$keywords,
                                                 "cutoff_frequency" => 1.0
+                                            ]
+                                        ]
+                                    ],
+                                    [
+                                        "multi_match"=>[
+                                            "query"=>$keywords,
+                                            "fields"=>[
+                                                "nck_nm",
+                                                "lctgr_nm",
+                                                "mctgr_nm",
+                                                "sctgr_nm",
+                                                "brand_nm",
+                                                "mem_id"
                                             ]
                                         ]
                                     ]
