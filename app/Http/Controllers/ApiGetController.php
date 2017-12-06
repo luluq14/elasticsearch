@@ -640,7 +640,7 @@ class ApiGetController extends BaseController
                             [
                                 "filter"=>[
                                     "match"=>[
-                                        "mctgr_no"=>256
+                                        "mctgr_no"=>326
                                     ]
                                 ],
                                 "weight"=>5
