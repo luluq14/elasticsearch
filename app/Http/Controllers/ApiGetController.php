@@ -591,7 +591,7 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $should=$request->input('should');
+//        $should=$request->input('should');
         $page=$request->input('page');
         $limit=$request->input('limit');
         $from=$page*$limit;
@@ -707,17 +707,17 @@ class ApiGetController extends BaseController
             }
         }
 
-        if(!empty($should)) {
-            $should=json_decode($should,true);
-            foreach ($should as $key => $value) {
-                $params['body']['query']['function_score']['query']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
-                        ]
-                    ];
-            }
-        }
+//        if(!empty($should)) {
+//            $should=json_decode($should,true);
+//            foreach ($should as $key => $value) {
+//                $params['body']['query']['function_score']['query']['bool']['should'][] =
+//                    [
+//                        "terms" => [
+//                            $key => $value
+//                        ]
+//                    ];
+//            }
+//        }
 
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
@@ -734,7 +734,8 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
+//                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][]=
                     [
                         "terms"=> [
                             $key =>$value
