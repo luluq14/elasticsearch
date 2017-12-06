@@ -54,8 +54,7 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm",
-                                        "mem_id"
+                                        "brand_nm"
                                     ]
                                 ]
                             ]
@@ -167,8 +166,7 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm",
-                                        "mem_id"
+                                        "brand_nm"
                                     ]
                                 ]
                             ]
@@ -280,8 +278,7 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm",
-                                        "mem_id"
+                                        "brand_nm"
                                     ]
                                 ]
                             ]
@@ -499,8 +496,7 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm",
-                                        "mem_id"
+                                        "brand_nm"
                                     ]
                                 ]
                             ]
@@ -625,8 +621,7 @@ class ApiGetController extends BaseController
                                                 "lctgr_nm",
                                                 "mctgr_nm",
                                                 "sctgr_nm",
-                                                "brand_nm",
-                                                "mem_id"
+                                                "brand_nm"
                                             ]
                                         ]
                                     ]
