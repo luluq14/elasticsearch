@@ -594,7 +594,7 @@ class ApiGetController extends BaseController
         $should=$request->input('should');
         $page=$request->input('page');
         $limit=$request->input('limit');
-        $from=($page-1)*$limit;
+        $from=$page*$limit;
 
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
