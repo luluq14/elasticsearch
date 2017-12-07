@@ -35,7 +35,9 @@ class ApiGetController extends BaseController
             'index' => 'oracle',
             'size' =>0,
             'body' => [
-                'query' => [
+                'query'=>[
+                    'function_score'=>[
+                        'query' => [
                     'bool' => [
                         'should' =>[
                             [
@@ -59,6 +61,8 @@ class ApiGetController extends BaseController
                                 ]
                             ]
                         ]
+                    ]
+                ]
                     ]
                 ],
                 'aggs' =>[
@@ -94,7 +98,7 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -107,7 +111,7 @@ class ApiGetController extends BaseController
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
             foreach ($filter as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
                             $key => $value
@@ -119,7 +123,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][]=
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -147,7 +151,9 @@ class ApiGetController extends BaseController
             'index' => 'oracle',
             'size' =>0,
             'body' => [
-                'query' => [
+                'query'=>[
+                    'function_score'=>[
+                        'query' => [
                     'bool' => [
                         'should' => [
                             [
@@ -172,6 +178,8 @@ class ApiGetController extends BaseController
                             ]
                         ]
                     ]
+                ]
+                        ]
                 ],
                 'aggs' =>[
                     "group_by_no"=> [
@@ -206,7 +214,7 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -219,7 +227,7 @@ class ApiGetController extends BaseController
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
             foreach ($filter as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
                             $key => $value
@@ -231,7 +239,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][]=
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -259,7 +267,9 @@ class ApiGetController extends BaseController
             'index' => 'oracle',
             'size' =>0,
             'body' => [
-                'query' => [
+                'query'=>[
+                    'function_score'=>[
+                        'query' => [
                     'bool' => [
                         'should' =>[
                             [
@@ -284,6 +294,8 @@ class ApiGetController extends BaseController
                             ]
                         ]
                     ]
+                ]
+                        ]
                 ],
                 'aggs' =>[
                     "group_by_no"=> [
@@ -317,7 +329,7 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -330,7 +342,7 @@ class ApiGetController extends BaseController
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
             foreach ($filter as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
                             $key => $value
@@ -342,7 +354,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][]=
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
@@ -476,8 +488,10 @@ class ApiGetController extends BaseController
         $params = [
             'index' => 'oracle',
             'size' =>0,
-            'body' => [
-                'query' => [
+            'body' =>[
+                'query'=>[
+                    'function_score'=>[
+                        'query' => [
                     'bool' => [
                         'should' => [
                             [
@@ -502,6 +516,8 @@ class ApiGetController extends BaseController
                             ]
                         ]
                     ]
+                ]
+                        ]
                 ],
                 'aggs' =>[
                     "group_by_no"=> [
@@ -536,7 +552,7 @@ class ApiGetController extends BaseController
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -549,7 +565,7 @@ class ApiGetController extends BaseController
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
             foreach ($filter as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
                             $key => $value
@@ -561,7 +577,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['bool']['filter']['bool']['must'][]=
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
                             $key =>$value
