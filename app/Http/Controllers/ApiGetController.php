@@ -593,19 +593,19 @@ class ApiGetController extends BaseController
             ]
         ];
 
-        if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
-            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords))
-            || (preg_match('/tempered glass /',$keywords)) || (preg_match('/ tempered glass /',$keywords))
-            || (preg_match('/baterai /',$keywords)) || (preg_match('/ baterai /',$keywords))
-            || (preg_match('/anti gores /',$keywords)) || (preg_match('/ anti gores /',$keywords))
-            || (preg_match('/screen protector /',$keywords)) || (preg_match('/ screen protector /',$keywords))
-            || (preg_match('/charger /',$keywords)) || (preg_match('/ charger /',$keywords))
-            || (preg_match('/sparepart /',$keywords)) || (preg_match('/ sparepart /',$keywords))
-            || (preg_match('/kabel data /',$keywords)) || (preg_match('/ kabel data /',$keywords))
-            || (preg_match('/powerbank /',$keywords)) || (preg_match('/ powerbank /',$keywords))
-            || (preg_match('/stand /',$keywords)) || (preg_match('/ stand /',$keywords))
-            || (preg_match('/tongsis /',$keywords)) || (preg_match('/ tongsis /',$keywords))
-            || (preg_match('/lensa /',$keywords)) || (preg_match('/ lensa /',$keywords))
+        if ((preg_match('/case/',$keywords)) || (preg_match('/ case /',$keywords))
+            || (preg_match('/casing/',$keywords)) || (preg_match('/ casing /',$keywords))
+            || (preg_match('/tempered glass/',$keywords)) || (preg_match('/ tempered glass /',$keywords))
+            || (preg_match('/baterai/',$keywords)) || (preg_match('/ baterai /',$keywords))
+            || (preg_match('/anti gores/',$keywords)) || (preg_match('/ anti gores /',$keywords))
+            || (preg_match('/screen protector/',$keywords)) || (preg_match('/ screen protector /',$keywords))
+            || (preg_match('/charger/',$keywords)) || (preg_match('/ charger /',$keywords))
+            || (preg_match('/sparepart/',$keywords)) || (preg_match('/ sparepart /',$keywords))
+            || (preg_match('/kabel data/',$keywords)) || (preg_match('/ kabel data /',$keywords))
+            || (preg_match('/powerbank/',$keywords)) || (preg_match('/ powerbank /',$keywords))
+            || (preg_match('/stand/',$keywords)) || (preg_match('/ stand /',$keywords))
+            || (preg_match('/tongsis/',$keywords)) || (preg_match('/ tongsis /',$keywords))
+            || (preg_match('/lensa/',$keywords)) || (preg_match('/ lensa /',$keywords))
 
         ){
             $hasil=[
