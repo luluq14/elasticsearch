@@ -41,14 +41,16 @@ class ApiGetController extends BaseController
                             [
                                 "multi_match"=>[
                                     "query"=>$keyword,
+                                    "type"=> "best_fields",
                                     "fields"=>[
-                                        "prd_nm",
+                                        "prd_nm^10",
                                         "nck_nm",
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
                                         "brand_nm"
-                                    ]
+                                    ],
+                                    "operator"=> "and"
                                 ]
                             ]
                         ]
@@ -146,14 +148,16 @@ class ApiGetController extends BaseController
                             [
                                 "multi_match"=>[
                                     "query"=>$keywords,
+                                    "type"=> "best_fields",
                                     "fields"=>[
-                                        "prd_nm",
+                                        "prd_nm^10",
                                         "nck_nm",
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
                                         "brand_nm"
-                                    ]
+                                    ],
+                                    "operator"=> "and"
                                 ]
                             ]
                         ]
@@ -251,14 +255,16 @@ class ApiGetController extends BaseController
                             [
                                 "multi_match"=>[
                                     "query"=>$keyword,
+                                    "type"=> "best_fields",
                                     "fields"=>[
-                                        "prd_nm",
+                                        "prd_nm^10",
                                         "nck_nm",
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
                                         "brand_nm"
-                                    ]
+                                    ],
+                                    "operator"=> "and"
                                 ]
                             ]
                         ]
@@ -462,14 +468,16 @@ class ApiGetController extends BaseController
                             [
                                 "multi_match"=>[
                                     "query"=>$keywords,
+                                    "type"=> "best_fields",
                                     "fields"=>[
-                                        "prd_nm",
+                                        "prd_nm^10",
                                         "nck_nm",
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
                                         "brand_nm"
-                                    ]
+                                    ],
+                                    "operator"=> "and"
                                 ]
                             ]
                         ]
@@ -567,6 +575,55 @@ class ApiGetController extends BaseController
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
 
+        $multi=[
+            [
+                "multi_match"=>[
+                    "query"=>$keywords,
+                    "type"=> "best_fields",
+                    "fields"=>[
+                        "prd_nm^10",
+                        "nck_nm",
+                        "lctgr_nm",
+                        "mctgr_nm",
+                        "sctgr_nm",
+                        "brand_nm"
+                    ],
+                    "operator"=> "and"
+                ]
+            ]
+        ];
+
+        if ((preg_match('/case /',$keywords)) || (preg_match('/ case /',$keywords))
+            || (preg_match('/casing /',$keywords)) || (preg_match('/ casing /',$keywords))
+            || (preg_match('/tempered glass /',$keywords)) || (preg_match('/ tempered glass /',$keywords))
+            || (preg_match('/baterai /',$keywords)) || (preg_match('/ baterai /',$keywords))
+            || (preg_match('/anti gores /',$keywords)) || (preg_match('/ anti gores /',$keywords))
+            || (preg_match('/screen protector /',$keywords)) || (preg_match('/ screen protector /',$keywords))
+            || (preg_match('/charger /',$keywords)) || (preg_match('/ charger /',$keywords))
+            || (preg_match('/sparepart /',$keywords)) || (preg_match('/ sparepart /',$keywords))
+            || (preg_match('/kabel data /',$keywords)) || (preg_match('/ kabel data /',$keywords))
+            || (preg_match('/powerbank /',$keywords)) || (preg_match('/ powerbank /',$keywords))
+            || (preg_match('/stand /',$keywords)) || (preg_match('/ stand /',$keywords))
+            || (preg_match('/tongsis /',$keywords)) || (preg_match('/ tongsis /',$keywords))
+            || (preg_match('/lensa /',$keywords)) || (preg_match('/ lensa /',$keywords))
+
+        ){
+            $hasil=[
+                'must' =>$multi
+            ];
+        }else{
+            $hasil=[
+                'must' =>$multi,
+                'must_not'=>[
+                    "term"=>[
+                        "mctgr_no"=>[
+                            "value"=> "363"
+                        ]
+                    ]
+                ]
+            ];
+        }
+
         $params = [
             'index' => 'oracle',
             'from' => $from,
@@ -575,23 +632,7 @@ class ApiGetController extends BaseController
                 'query' => [
                     'function_score' =>[
                         'query'=>[
-                            'bool'=>[
-                                'must' =>[
-                                    [
-                                        "multi_match"=>[
-                                            "query"=>$keywords,
-                                            "fields"=>[
-                                                "prd_nm",
-                                                "nck_nm",
-                                                "lctgr_nm",
-                                                "mctgr_nm",
-                                                "sctgr_nm",
-                                                "brand_nm"
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
+                            'bool'=>$hasil
                         ],
                         "boost" => "5",
                         "functions"=>[
