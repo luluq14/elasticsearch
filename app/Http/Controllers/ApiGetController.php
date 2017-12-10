@@ -575,54 +575,54 @@ class ApiGetController extends BaseController
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
 
-        $multi=[
-            [
-                "multi_match"=>[
-                    "query"=>$keywords,
-                    "type"=> "best_fields",
-                    "fields"=>[
-                        "prd_nm^10",
-                        "nck_nm",
-                        "lctgr_nm",
-                        "mctgr_nm",
-                        "sctgr_nm",
-                        "brand_nm"
-                    ],
-                    "operator"=> "and"
-                ]
-            ]
-        ];
+//        $multi=[
+//            [
+//                "multi_match"=>[
+//                    "query"=>$keywords,
+//                    "type"=> "best_fields",
+//                    "fields"=>[
+//                        "prd_nm^10",
+//                        "nck_nm",
+//                        "lctgr_nm",
+//                        "mctgr_nm",
+//                        "sctgr_nm",
+//                        "brand_nm"
+//                    ],
+//                    "operator"=> "and"
+//                ]
+//            ]
+//        ];
 
-        if ((preg_match('/case/',$keywords)) || (preg_match('/ case /',$keywords))
-            || (preg_match('/casing/',$keywords)) || (preg_match('/ casing /',$keywords))
-            || (preg_match('/tempered glass/',$keywords)) || (preg_match('/ tempered glass /',$keywords))
-            || (preg_match('/baterai/',$keywords)) || (preg_match('/ baterai /',$keywords))
-            || (preg_match('/anti gores/',$keywords)) || (preg_match('/ anti gores /',$keywords))
-            || (preg_match('/screen protector/',$keywords)) || (preg_match('/ screen protector /',$keywords))
-            || (preg_match('/charger/',$keywords)) || (preg_match('/ charger /',$keywords))
-            || (preg_match('/sparepart/',$keywords)) || (preg_match('/ sparepart /',$keywords))
-            || (preg_match('/kabel data/',$keywords)) || (preg_match('/ kabel data /',$keywords))
-            || (preg_match('/powerbank/',$keywords)) || (preg_match('/ powerbank /',$keywords))
-            || (preg_match('/stand/',$keywords)) || (preg_match('/ stand /',$keywords))
-            || (preg_match('/tongsis/',$keywords)) || (preg_match('/ tongsis /',$keywords))
-            || (preg_match('/lensa/',$keywords)) || (preg_match('/ lensa /',$keywords))
-
-        ){
-            $hasil=[
-                'must' =>$multi
-            ];
-        }else{
-            $hasil=[
-                'must' =>$multi,
-                'must_not'=>[
-                    "term"=>[
-                        "mctgr_no"=>[
-                            "value"=> "363"
-                        ]
-                    ]
-                ]
-            ];
-        }
+//        if ((preg_match('/case/',$keywords)) || (preg_match('/ case /',$keywords))
+//            || (preg_match('/casing/',$keywords)) || (preg_match('/ casing /',$keywords))
+//            || (preg_match('/tempered glass/',$keywords)) || (preg_match('/ tempered glass /',$keywords))
+//            || (preg_match('/baterai/',$keywords)) || (preg_match('/ baterai /',$keywords))
+//            || (preg_match('/anti gores/',$keywords)) || (preg_match('/ anti gores /',$keywords))
+//            || (preg_match('/screen protector/',$keywords)) || (preg_match('/ screen protector /',$keywords))
+//            || (preg_match('/charger/',$keywords)) || (preg_match('/ charger /',$keywords))
+//            || (preg_match('/sparepart/',$keywords)) || (preg_match('/ sparepart /',$keywords))
+//            || (preg_match('/kabel data/',$keywords)) || (preg_match('/ kabel data /',$keywords))
+//            || (preg_match('/powerbank/',$keywords)) || (preg_match('/ powerbank /',$keywords))
+//            || (preg_match('/stand/',$keywords)) || (preg_match('/ stand /',$keywords))
+//            || (preg_match('/tongsis/',$keywords)) || (preg_match('/ tongsis /',$keywords))
+//            || (preg_match('/lensa/',$keywords)) || (preg_match('/ lensa /',$keywords))
+//
+//        ){
+//            $hasil=[
+//                'must' =>$multi
+//            ];
+//        }else{
+//            $hasil=[
+//                'must' =>$multi,
+//                'must_not'=>[
+//                    "term"=>[
+//                        "mctgr_no"=>[
+//                            "value"=> "363"
+//                        ]
+//                    ]
+//                ]
+//            ];
+//        }
 
         $params = [
             'index' => 'oracle',
@@ -632,7 +632,25 @@ class ApiGetController extends BaseController
                 'query' => [
                     'function_score' =>[
                         'query'=>[
-                            'bool'=>$hasil
+                            'bool'=>[
+                                "must"=>[
+                                    [
+                                        "multi_match"=>[
+                                            "query"=>$keywords,
+                                            "type"=> "best_fields",
+                                            "fields"=>[
+                                                "prd_nm^10",
+                                                "nck_nm",
+                                                "lctgr_nm",
+                                                "mctgr_nm",
+                                                "sctgr_nm",
+                                                "brand_nm"
+                                            ],
+                                            "operator"=> "and"
+                                        ]
+                                    ]
+                                ]
+                            ]
                         ],
                         "boost" => "5",
                         "functions"=>[
@@ -757,6 +775,28 @@ class ApiGetController extends BaseController
                             'order' => $value['order']
                         ]
                     ];
+                if($key=="ctgr_bstng") {
+                    $params['body']['sort'][] =
+                        [
+                            "_script" => [
+                                'script' => "doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('iPhone') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('IPHONE') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('Samsung') ? 90 :  doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('SAMSUNG') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('Xiaomi') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('XIAOMI') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('Vivo') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('VIVO') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('OPPO') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('Oppo') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('Asus') ? 90 : doc['mctgr_no'].value == 360 &&
+                                            doc['prd_nm.keyword'].value.contains('ASUS') ? 90: 50",
+                                "type" => "number",
+                                "order" => $value['order']
+                            ]
+                        ];
+                }
             }
         }
 
@@ -799,6 +839,7 @@ class ApiGetController extends BaseController
             }
 
         }
+        print_r($params);
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
