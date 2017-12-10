@@ -839,7 +839,7 @@ class ApiGetController extends BaseController
             }
 
         }
-        print_r($params);
+        print_r($params);die();
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
