@@ -769,12 +769,7 @@ class ApiGetController extends BaseController
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
             foreach ($sort as $key => $value) {
-                $params['body']['sort'][] =
-                    [
-                        $key => [
-                            'order' => $value['order']
-                        ]
-                    ];
+
                 if($key=="ctgr_bstng") {
                     $params['body']['sort'][] =
                         [
@@ -794,6 +789,13 @@ class ApiGetController extends BaseController
                                             doc['prd_nm.keyword'].value.contains('ASUS') ? 90: 50",
                                 "type" => "number",
                                 "order" => $value['order']
+                            ]
+                        ];
+                }else{
+                    $params['body']['sort'][] =
+                        [
+                            $key => [
+                                'order' => $value['order']
                             ]
                         ];
                 }
