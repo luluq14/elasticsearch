@@ -574,6 +574,7 @@ class ApiGetController extends BaseController
 
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
+        $booster=$this->booster($keywords);
 
 //        $multi=[
 //            [
@@ -771,22 +772,30 @@ class ApiGetController extends BaseController
             foreach ($sort as $key => $value) {
 
                 if($key=="ctgr_bstng") {
+//                    print_r($booster);
+                    if(count($booster)>0){
+
+                        if(!empty(@$booster[0]['_source']['sctgr_no'])){
+                            $script="(doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." && doc['sctgr_no'].value == ".$booster[0]['_source']['sctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && !empty(@$booster[0]['_source']['mctgr_no'])){
+                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no']." && doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." ) ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && empty(@$booster[0]['_source']['mctgr_no']) && !empty(@$booster[0]['_source']['lctgr_no '])){
+                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }else{
+                            $script="(doc['prd_nm.keyword'].value.contains(".$keywords.")) ? 10 : 10";
+
+                        }
+                    }else{
+                        $script="(doc['prd_nm.keyword'].value.contains(".$keywords.")) ? 10 : 10";
+                    }
+
                     $params['body']['sort'][] =
                         [
                             "_script" => [
-                                'script' => "doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('iPhone') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('IPHONE') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('Samsung') ? 90 :  doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('SAMSUNG') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('Xiaomi') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('XIAOMI') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('Vivo') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('VIVO') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('OPPO') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('Oppo') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('Asus') ? 90 : doc['mctgr_no'].value == 360 &&
-                                            doc['prd_nm.keyword'].value.contains('ASUS') ? 90: 50",
+                                'script' => $script,
                                 "type" => "number",
                                 "order" => $value['order']
                             ]
@@ -1027,5 +1036,33 @@ class ApiGetController extends BaseController
         }
 
         return $keywords;
+    }
+
+    public function booster($keywords=""){
+        $params = [
+            'index' => 'ozdiccategorybooster-new',
+            '_source'=> ["od_word","lctgr_no","mctgr_no","sctgr_no","weight"],
+            'body' => [
+                'query' => [
+                    "term"=>[
+                        "od_word"=> $keywords
+                    ]
+                ],
+                'sort'=>[
+                    [
+                        "weight"=>[
+                            "order"=> "desc"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response['hits']['hits'];
     }
 }
