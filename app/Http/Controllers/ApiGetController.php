@@ -562,7 +562,7 @@ class ApiGetController extends BaseController
 
 
     public function search(Request $request,$keyword=""){
-
+        $keyword=addslashes($keyword);
         $sort=$request->input('sort');
         $term=$request->input('terms');
         $range=$request->input('range');
@@ -785,11 +785,11 @@ class ApiGetController extends BaseController
                             $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
 
                         }else{
-                            $script="(doc['prd_nm.keyword'].value.contains(".$keywords.")) ? 10 : 10";
+                            $script="(doc['prd_nm.keyword'].value.contains('".$keywords."')) ? 10 : 10";
 
                         }
                     }else{
-                        $script="(doc['prd_nm.keyword'].value.contains(".$keywords.")) ? 10 : 10";
+                        $script="(doc['prd_nm.keyword'].value.contains('".$keywords."')) ? 10 : 10";
                     }
 
                     $params['body']['sort'][] =
@@ -851,6 +851,7 @@ class ApiGetController extends BaseController
 
         }
 
+//        print_r($params);die();
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
         ->build();              // Build the client object
