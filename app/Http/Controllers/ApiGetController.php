@@ -32,7 +32,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle',
+            'index' => 'oracle-new',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -139,7 +139,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle',
+            'index' => 'oracle-new',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -246,7 +246,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle',
+            'index' => 'oracle-new',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -459,7 +459,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle',
+            'index' => 'oracle-new',
             'size' =>0,
             'body' =>[
                 'query' => [
@@ -626,7 +626,7 @@ class ApiGetController extends BaseController
 //        }
 
         $params = [
-            'index' => 'oracle',
+            'index' => 'oracle-new',
             'from' => $from,
             'size' =>$limit,
             'body' => [
