@@ -746,7 +746,7 @@ class ApiGetController extends BaseController
                     $params['body']['sort'][] =
                         [
                             "_script" => [
-                                'script' => $script,
+                                "script" => addslashes($script),
                                 "type" => "number",
                                 "order" => $value['order']
                             ]
