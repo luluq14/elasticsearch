@@ -721,11 +721,11 @@ class ApiGetController extends BaseController
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
             foreach ($sort as $key => $value) {
-
+                $keywords=addslashes($keywords);
                 if($key=="ctgr_bstng") {
 //                    print_r($booster);
                     if(count($booster)>0){
-                        $keywords=addslashes($keywords);
+
                         if(!empty(@$booster[0]['_source']['sctgr_no'])){
                             $script="(doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." && doc['sctgr_no'].value == ".$booster[0]['_source']['sctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
 
