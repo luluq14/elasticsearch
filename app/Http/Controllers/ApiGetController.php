@@ -720,8 +720,9 @@ class ApiGetController extends BaseController
 
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
+            $keywords=addslashes($keywords);
             foreach ($sort as $key => $value) {
-                $keywords=addslashes($keywords);
+
                 if($key=="ctgr_bstng") {
 //                    print_r($booster);
                     if(count($booster)>0){
