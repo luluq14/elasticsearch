@@ -588,7 +588,7 @@ class ApiGetController extends BaseController
                                 "must"=>[
                                     [
                                         "multi_match"=>[
-                                            "query"=>$keywords,
+                                            "query"=> str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords),
                                             "type"=> "best_fields",
                                             "fields"=>[
                                                 "prd_nm^10",
