@@ -720,7 +720,8 @@ class ApiGetController extends BaseController
 
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
-            $keywords=addslashes($keywords);
+            $keywords=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~&%\'+-')," ", $keywords);
+
             foreach ($sort as $key => $value) {
 
                 if($key=="ctgr_bstng") {
@@ -762,7 +763,6 @@ class ApiGetController extends BaseController
                 }
             }
         }
-
         if(!empty($range)) {
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
