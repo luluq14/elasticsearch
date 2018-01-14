@@ -83,7 +83,7 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
 Route::get('/search/{keywords}', 'ApiGetController@search');
 
 /**
- * @api {get} /sinonim/{keywords} Search
+ * @api {get} /sinonim/{keywords} Sinonim
  *
  * @apiGroup Search Get
  * @apiVersion 0.0.1
