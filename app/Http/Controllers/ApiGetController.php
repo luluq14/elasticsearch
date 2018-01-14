@@ -803,6 +803,23 @@ class ApiGetController extends BaseController
 
         }
 
+        if(!empty($match)){
+            $match=json_decode($match,true);
+            foreach ($match as $key => $value){
+                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                    //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
+                    [
+                        "match"=> [
+                            $key =>[
+                                "query"     =>  $value,
+                                "operator"  => "and"
+                            ]
+                        ]
+                    ];
+            }
+
+        }
+
 //        print_r($params);die();
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
