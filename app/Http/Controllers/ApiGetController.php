@@ -1036,4 +1036,362 @@ class ApiGetController extends BaseController
         $response = $client->search($params);
         return $response['hits']['hits'];
     }
+
+    public function searchSinonim(Request $request,$keyword=""){
+//        $keyword=addslashes($keyword);
+        $sort=$request->input('sort');
+        $term=$request->input('terms');
+        $range=$request->input('range');
+        $match=$request->input('match');
+        $filter=$request->input('filter');
+        $page=$request->input('page');
+        $limit=$request->input('limit');
+        $from=$page*$limit;
+
+        $keywords=$this->replace($keyword);
+        $suggest=$this->cek($keyword);
+        $booster=$this->booster($keywords);
+        $sinonim=$this->getSinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
+        if(!$sinonim){
+            $sinonim=$keywords;
+        }else{
+           $sinonim=$sinonim['od_word'];
+        }
+
+        $params = [
+            'index' => 'oracle-new',
+            'from' => $from,
+            'size' =>$limit,
+            'body' => [
+                'query' => [
+                    'function_score' =>[
+                        'query'=>[
+                            'bool'=>[
+                                "must"=>[
+                                    [
+                                        "query_string"=>[
+                                            "type"=> "best_fields",
+                                            "fields"=>[
+                                                "prd_nm^10",
+                                                "nck_nm",
+                                                "lctgr_nm",
+                                                "mctgr_nm",
+                                                "sctgr_nm",
+                                                "brand_nm"
+                                            ],
+                                            "default_operator"=> "AND",
+                                            "query"=> $sinonim
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "boost" => "5",
+                        "functions"=>[
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>360
+                                    ]
+                                ],
+                                "weight"=>5
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>3691
+                                    ]
+                                ],
+                                "weight"=>5
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>326
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>363
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>4995
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>5047
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>417
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>382
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>5012
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>459
+                                    ]
+                                ],
+                                "weight"=>4
+                            ],
+                            [
+                                "filter"=>[
+                                    "match"=>[
+                                        "mctgr_no"=>445
+                                    ]
+                                ],
+                                "weight"=>4
+                            ]
+
+                        ],
+                        "max_boost"=>10,
+                        "score_mode"=> "max",
+                        "boost_mode"=>"multiply",
+                        "min_score" => 1
+                    ]
+                ],
+                'aggs' =>[
+                    "max_price"=> [
+                        "max"=> [
+                            "field"=> "final_dsc_prc"
+                        ]
+                    ],
+                    "min_price"=> [
+                        "min"=> [
+                            "field"=> "final_dsc_prc"
+                        ]
+                    ]
+                ],
+            ]
+        ];
+
+
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            $keywords=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~&%\'+-')," ", $keywords);
+
+            foreach ($sort as $key => $value) {
+
+                if($key=="ctgr_bstng") {
+//                    print_r($booster);
+                    if(count($booster)>0){
+
+                        if(!empty(@$booster[0]['_source']['sctgr_no'])){
+                            $script="(doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." && doc['sctgr_no'].value == ".$booster[0]['_source']['sctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && !empty(@$booster[0]['_source']['mctgr_no'])){
+                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no']." && doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." ) ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && empty(@$booster[0]['_source']['mctgr_no']) && !empty(@$booster[0]['_source']['lctgr_no '])){
+                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
+
+                        }else{
+                            $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+
+                        }
+                    }else{
+                        $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+                    }
+
+                    $params['body']['sort'][] =
+                        [
+                            "_script" => [
+                                'script' => $script,
+                                "type" => "number",
+                                "order" => $value['order']
+                            ]
+                        ];
+                }else{
+                    $params['body']['sort'][] =
+                        [
+                            $key => [
+                                'order' => $value['order']
+                            ]
+                        ];
+                }
+            }
+        }
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                //   $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
+                $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                    //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
+        }
+
+        if(!empty($match)){
+            $match=json_decode($match,true);
+            foreach ($match as $key => $value){
+                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                    //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
+                    [
+                        "match"=> [
+                            $key =>[
+                                "query"     =>  $value,
+                                "operator"  => "and"
+                            ]
+                        ]
+                    ];
+            }
+
+        }
+
+//        print_r($params);die();
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        $response["key"]=$keyword;
+        $response["correct"]=$keywords;
+        $response["suggest"]=$suggest;
+        return $response;
+    }
+
+    public function getIdSinonim($keywords=""){
+        $params = [
+            'index' => 'ozdicthesaurus',
+            '_source'=> ["od_id","od_word"],
+            'body' => [
+                'query' => [
+                    "bool"=>[
+                        "must"=>[
+                            [
+                                "term"=>[
+                                    "od_word"=> $keywords
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "od_status"=> 0
+                                ]
+                            ]
+                        ]
+                    ]
+
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        if(empty($response['hits']['hits'])){
+            return false;
+        }
+
+        return $response['hits']['hits'][0]['_source']['od_id'];
+    }
+
+    public function sinonim($id_sinonim){
+        $params = [
+            'index' => 'ozdicthesaurus',
+            '_source'=> ["od_id","od_word"],
+            'body' => [
+                'query' => [
+                        "term"=>[
+                            "od_id"=> $id_sinonim
+                        ]
+                ]
+                ,
+                'sort'=>[
+                    [
+                        "od_order"=>[
+                            "order"=> "asc"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        if(empty($response['hits']['hits'])){
+            return false;
+        }
+
+        return $response['hits']['hits'][0]['_source'];
+    }
+
+    public function getSinonim($keywords=""){
+        $id_sinonim=$this->getIdSinonim($keywords);
+
+        if(!empty($id_sinonim)){
+            $sinonim=$this->sinonim($id_sinonim);
+            return $sinonim;
+        }else{
+            return false;
+        }
+    }
 }
