@@ -566,6 +566,7 @@ class ApiGetController extends BaseController
         $sort=$request->input('sort');
         $term=$request->input('terms');
         $range=$request->input('range');
+        $match=$request->input('match');
         $filter=$request->input('filter');
         $page=$request->input('page');
         $limit=$request->input('limit');

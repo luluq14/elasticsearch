@@ -88,7 +88,7 @@ define({ "api": [
     "description": "<p>{keywords} type string, not empty parameter {keywords} to search document</p>",
     "sampleRequest": [
       {
-        "url": "/search/samsung?sort={\"ctgr_bstng\":{\"order\":\"desc\"},\"pop_score\":{\"order\":\"desc\"},\"sel_prc\":{\"order\":\"asc\"}}&&page=0&&limit=10"
+        "url": "/search/samsung?sort={\"ctgr_bstng\":{\"order\":\"desc\"},\"pop_score\":{\"order\":\"desc\"},\"sel_prc\":{\"order\":\"asc\"}}&&match={\"prd_nm\":\"s8%20plus\"}&&page=0&&limit=10"
       }
     ],
     "filename": "routes/web.php",

@@ -78,6 +78,6 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort={"ctgr_bstng":{"order":"desc"},"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&page=0&&limit=10
+ * @apiSampleRequest /search/samsung?sort={"ctgr_bstng":{"order":"desc"},"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&match={"prd_nm":"s8%20plus"}&&page=0&&limit=10
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');
