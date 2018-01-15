@@ -739,11 +739,13 @@ class ApiGetController extends BaseController
                             $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
 
                         }else{
-                            $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+//                            $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+                            $script="doc['sale_score2'].values == 1 ? 10 : 10";
 
                         }
                     }else{
-                        $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+//                        $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+                        $script="doc['sale_score2'].values == 1 ? 10 : 10";
                     }
 
                     $params['body']['sort'][] =
