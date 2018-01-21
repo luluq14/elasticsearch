@@ -1053,11 +1053,11 @@ class ApiGetController extends BaseController
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
         $booster=$this->booster($keywords);
-        $sinonim=$this->getSinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
         if(!$sinonim){
-            $sinonim=$keywords;
+            $sinonim=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords);
         }else{
-           $sinonim=$sinonim['od_word'];
+            $sinonim=str_replace(","," OR ",$sinonim);
         }
 
         $params = [
@@ -1222,11 +1222,10 @@ class ApiGetController extends BaseController
                             $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
 
                         }else{
-                            $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
-
+                            $script="doc['sale_score2'].values == 1 ? 10 : 10";
                         }
                     }else{
-                        $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
+                        $script="doc['sale_score2'].values == 1 ? 10 : 10";
                     }
 
                     $params['body']['sort'][] =
@@ -1304,7 +1303,6 @@ class ApiGetController extends BaseController
 
         }
 
-//        print_r($params);die();
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
         ->build();              // Build the client object
@@ -1316,27 +1314,15 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-    public function getIdSinonim($keywords=""){
+    public function sinonim($keyword=""){
         $params = [
-            'index' => 'ozdicthesaurus',
-            '_source'=> ["od_id","od_word"],
+            'index' => 'synonim',
+            '_source'=> ["synonim"],
             'body' => [
                 'query' => [
-                    "bool"=>[
-                        "must"=>[
-                            [
-                                "term"=>[
-                                    "od_word"=> $keywords
-                                ]
-                            ],
-                            [
-                                "term"=>[
-                                    "od_status"=> 0
-                                ]
-                            ]
+                        "match"=>[
+                            "synonim"=> $keyword
                         ]
-                    ]
-
                 ]
             ]
         ];
@@ -1350,50 +1336,6 @@ class ApiGetController extends BaseController
             return false;
         }
 
-        return $response['hits']['hits'][0]['_source']['od_id'];
-    }
-
-    public function sinonim($id_sinonim){
-        $params = [
-            'index' => 'ozdicthesaurus',
-            '_source'=> ["od_id","od_word"],
-            'body' => [
-                'query' => [
-                        "term"=>[
-                            "od_id"=> $id_sinonim
-                        ]
-                ]
-                ,
-                'sort'=>[
-                    [
-                        "od_order"=>[
-                            "order"=> "asc"
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        if(empty($response['hits']['hits'])){
-            return false;
-        }
-
-        return $response['hits']['hits'][0]['_source'];
-    }
-
-    public function getSinonim($keywords=""){
-        $id_sinonim=$this->getIdSinonim($keywords);
-
-        if(!empty($id_sinonim)){
-            $sinonim=$this->sinonim($id_sinonim);
-            return $sinonim;
-        }else{
-            return false;
-        }
+        return $response['hits']['hits'][0]['_source']['synonim'];
     }
 }
