@@ -561,7 +561,7 @@ class ApiGetController extends BaseController
     }
 
 
-    public function search(Request $request,$keyword=""){
+    public function searchSinonim(Request $request,$keyword=""){
 //        $keyword=addslashes($keyword);
         $sort=$request->input('sort');
         $term=$request->input('terms');
@@ -1039,7 +1039,7 @@ class ApiGetController extends BaseController
         return $response['hits']['hits'];
     }
 
-    public function searchSinonim(Request $request,$keyword=""){
+    public function search(Request $request,$keyword=""){
 //        $keyword=addslashes($keyword);
         $sort=$request->input('sort');
         $term=$request->input('terms');

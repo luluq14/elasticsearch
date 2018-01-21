@@ -82,13 +82,5 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  */
 Route::get('/search/{keywords}', 'ApiGetController@search');
 
-/**
- * @api {get} /sinonim/{keywords} Sinonim
- *
- * @apiGroup Search Get
- * @apiVersion 0.0.1
- *
- * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /sinonim/samsung?sort={"ctgr_bstng":{"order":"desc"},"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&match={"prd_nm":"s8%20plus"}&&page=0&&limit=10
- */
-Route::get('/sinonim/{keywords}', 'ApiGetController@searchSinonim');
+
+//Route::get('/sinonim/{keywords}', 'ApiGetController@searchSinonim');
