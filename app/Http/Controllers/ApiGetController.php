@@ -1011,19 +1011,28 @@ class ApiGetController extends BaseController
         return $keywords;
     }
 
-    public function booster($keywords=""){
+    public function booster($sinonim=""){
         $params = [
-            'index' => 'ozdiccategorybooster-new',
+            'index' => 'ozdiccategorybooster',
             '_source'=> ["od_word","lctgr_no","mctgr_no","sctgr_no","weight"],
             'body' => [
                 'query' => [
-                    "term"=>[
-                        "od_word"=> $keywords
+                    "bool"=>[
+                        "must"=>[
+                            [
+                                "query_string"=>[
+                                    "type"=>"best_fields",
+                                    "default_field"=>"od_word",
+                                    "default_operator"=>"AND",
+                                    "query"=>$sinonim,
+                                ]
+                            ]
+                        ]
                     ]
                 ],
                 'sort'=>[
                     [
-                        "weight"=>[
+                        "weight.keyword"=>[
                             "order"=> "desc"
                         ]
                     ]
@@ -1036,6 +1045,7 @@ class ApiGetController extends BaseController
         ->build();              // Build the client object
 
         $response = $client->search($params);
+
         return $response['hits']['hits'];
     }
 
@@ -1052,13 +1062,14 @@ class ApiGetController extends BaseController
 
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
-        $booster=$this->booster($keywords);
         $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
         if(!$sinonim){
             $sinonim=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords);
         }else{
             $sinonim=str_replace(","," OR ",$sinonim);
         }
+        $booster=$this->booster($sinonim);
+
 
         $params = [
             'index' => 'oracle-new',
