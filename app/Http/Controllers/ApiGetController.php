@@ -30,7 +30,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-        $keyword=str_replace("/","\\/",$keyword);
 
         $params = [
             'index' => 'oracle-new',
@@ -139,8 +138,6 @@ class ApiGetController extends BaseController
         $range=$request->input('range');
         $filter=$request->input('filter');
 
-        $keywords=str_replace("/","\\/",$keywords);
-
         $params = [
             'index' => 'oracle-new',
             'size' =>0,
@@ -247,8 +244,6 @@ class ApiGetController extends BaseController
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
-
-        $keyword=str_replace("/","\\/",$keyword);
 
         $params = [
             'index' => 'oracle-new',
@@ -436,7 +431,7 @@ class ApiGetController extends BaseController
 
     public function missSpell(Request $request,$keywords=""){
         $keywords=str_replace("/","\\/",$keywords);
-        
+
         $cek= $this->checkSpell($keywords);
         $cek2= $this->checkSpell2($keywords);
         $get=$this->getSpell($keywords);
