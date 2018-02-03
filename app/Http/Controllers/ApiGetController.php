@@ -1012,6 +1012,7 @@ class ApiGetController extends BaseController
     }
 
     public function booster($sinonim=""){
+
         $params = [
             'index' => 'ozdiccategorybooster',
             '_source'=> ["od_word","lctgr_no","mctgr_no","sctgr_no","weight"],
@@ -1060,6 +1061,8 @@ class ApiGetController extends BaseController
         $limit=$request->input('limit');
         $from=$page*$limit;
 
+
+
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
         $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
@@ -1068,6 +1071,9 @@ class ApiGetController extends BaseController
         }else{
             $sinonim=str_replace(","," OR ",$sinonim);
         }
+
+        $sinonim=str_replace("/","\\/",$sinonim);
+
         $booster=$this->booster($sinonim);
 
 

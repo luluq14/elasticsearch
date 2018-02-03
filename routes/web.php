@@ -80,7 +80,7 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /search/samsung?sort={"ctgr_bstng":{"order":"desc"},"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&match={"prd_nm":"s8%20plus"}&&page=0&&limit=10
  */
-Route::get('/search/{keywords}', 'ApiGetController@search');
+Route::get('/search/{keywords}', 'ApiGetController@search')->where('keywords', '.*');
 
 
 //Route::get('/sinonim/{keywords}', 'ApiGetController@searchSinonim');
