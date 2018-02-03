@@ -46,7 +46,7 @@ Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /lctgr/iphone
  */
-Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
+Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr')->where('keywords', '.*');
 
 
 /**
@@ -58,7 +58,7 @@ Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /miss/samsun
  */
-Route::get('/miss/{keywords}', 'ApiGetController@missSpell');
+Route::get('/miss/{keywords}', 'ApiGetController@missSpell')->where('keywords', '.*');
 
 /**
  * @api {get} /brand/{keywords} List Brand
@@ -69,7 +69,7 @@ Route::get('/miss/{keywords}', 'ApiGetController@missSpell');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /brand/samsung
  */
-Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
+Route::get('/brand/{keywords}', 'ApiGetController@ListBrand')->where('keywords', '.*');
 
 /**
  * @api {get} /search/{keywords} Search
