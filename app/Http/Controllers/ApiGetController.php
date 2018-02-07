@@ -1067,9 +1067,9 @@ class ApiGetController extends BaseController
 
         $keywords=$this->replace($keyword);
         $suggest=$this->cek($keyword);
-        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords));
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords));
         if(!$sinonim){
-            $sinonim=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords);
+            $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
         }else{
             $sinonim=str_replace(","," OR ",$sinonim);
         }
@@ -1098,7 +1098,8 @@ class ApiGetController extends BaseController
                                                 "lctgr_nm",
                                                 "mctgr_nm",
                                                 "sctgr_nm",
-                                                "brand_nm"
+                                                "brand_nm",
+                                                "_id"
                                             ],
                                             "default_operator"=> "AND",
                                             "query"=> $sinonim
@@ -1223,7 +1224,7 @@ class ApiGetController extends BaseController
 
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
-            $keywords=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~&%\'+-')," ", $keywords);
+            $keywords=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~&%\'+-')," ", $keywords);
 
             foreach ($sort as $key => $value) {
 
