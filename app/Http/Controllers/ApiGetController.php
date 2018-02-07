@@ -1224,7 +1224,7 @@ class ApiGetController extends BaseController
 
         if(!empty($sort)) {
             $sort=json_decode($sort,true);
-            $keywords=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~&%\'+-')," ", $keywords);
+            $keywords=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~&%\'')," ", $keywords);
 
             foreach ($sort as $key => $value) {
 
