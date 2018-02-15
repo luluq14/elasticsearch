@@ -46,7 +46,7 @@ Route::get('/sctgr/{keyword}', 'ApiGetController@Sctgr');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /lctgr/iphone
  */
-Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
+Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr')->where('keywords', '.*');
 
 
 /**
@@ -58,7 +58,7 @@ Route::get('/lctgr/{keywords}', 'ApiGetController@Lctgr');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /miss/samsun
  */
-Route::get('/miss/{keywords}', 'ApiGetController@missSpell');
+Route::get('/miss/{keywords}', 'ApiGetController@missSpell')->where('keywords', '.*');
 
 /**
  * @api {get} /brand/{keywords} List Brand
@@ -69,7 +69,7 @@ Route::get('/miss/{keywords}', 'ApiGetController@missSpell');
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
  * @apiSampleRequest /brand/samsung
  */
-Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
+Route::get('/brand/{keywords}', 'ApiGetController@ListBrand')->where('keywords', '.*');
 
 /**
  * @api {get} /search/{keywords} Search
@@ -78,6 +78,9 @@ Route::get('/brand/{keywords}', 'ApiGetController@ListBrand');
  * @apiVersion 0.0.1
  *
  * @apiDescription {keywords} type string, not empty parameter {keywords} to search document
- * @apiSampleRequest /search/samsung?sort={"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&terms={"lctgr_nm.keyword":["Mobile Phone / Smartwatch","Handphone Android"],"mctgr_nm.keyword":["Mobile Phone","Mobile Phone / Smartwatch"],"sctgr_nm.keyword":["Handphone Android"]}&&range={"sel_prc":{"gte":"500000","lte":"1000000"},"buy_satisfy":{"gte":"0","lte":"100"}}&&filter={"free_shipping_yn.keyword":["Y"],"app_cdt_free_yn.keyword":["Y"]}&&page=0&&limit=10&&should={"brand_nm.keyword":["xiaomi","asus"],"brand_cd.keyword":["20007"]}
+ * @apiSampleRequest /search/samsung?sort={"ctgr_bstng":{"order":"desc"},"pop_score":{"order":"desc"},"sel_prc":{"order":"asc"}}&&match={"prd_nm":"s8%20plus"}&&page=0&&limit=10
  */
-Route::get('/search/{keywords}', 'ApiGetController@search');
+Route::get('/search/{keywords}', 'ApiGetController@search')->where('keywords', '.*');
+
+
+//Route::get('/sinonim/{keywords}', 'ApiGetController@searchSinonim');
