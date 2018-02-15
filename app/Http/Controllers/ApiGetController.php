@@ -32,7 +32,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -139,7 +139,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -246,7 +246,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'size' =>0,
             'body' => [
                 'query' => [
@@ -461,7 +461,7 @@ class ApiGetController extends BaseController
         $filter=$request->input('filter');
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'size' =>0,
             'body' =>[
                 'query' => [
@@ -580,7 +580,7 @@ class ApiGetController extends BaseController
 
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'from' => $from,
             'size' =>$limit,
             'body' => [
@@ -1080,7 +1080,7 @@ class ApiGetController extends BaseController
 
 
         $params = [
-            'index' => 'oracle-new',
+            'index' => 'oracle-sync',
             'from' => $from,
             'size' =>$limit,
             'body' => [
@@ -1103,6 +1103,11 @@ class ApiGetController extends BaseController
                                             ],
                                             "default_operator"=> "AND",
                                             "query"=> $sinonim
+                                        ]
+                                    ],
+                                    [
+                                        "term"=>[
+                                            "sel_stat_cd" => 103
                                         ]
                                     ]
                                 ]
