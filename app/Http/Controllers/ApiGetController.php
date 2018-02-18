@@ -1104,6 +1104,11 @@ class ApiGetController extends BaseController
                                             "default_operator"=> "AND",
                                             "query"=> $sinonim
                                         ]
+                                    ],
+                                    [
+                                        "term"=>[
+                                            "sel_stat_cd" => 103
+                                        ]
                                     ]
                                 ]
                             ]
