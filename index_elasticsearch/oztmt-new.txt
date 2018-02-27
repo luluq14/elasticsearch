@@ -1,0 +1,84 @@
+{
+  "oztmt-new": {
+    "aliases": {},
+    "mappings": {
+      "oztmt": {
+        "properties": {
+          "@timestamp": {
+            "type": "date"
+          },
+          "@version": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "cnt": {
+            "type": "long"
+          },
+          "keyword": {
+            "type": "text",
+            "analyzer": "autocomplete",
+            "search_analyzer": "autocomplete_search"
+          },
+          "logdate": {
+            "type": "date"
+          },
+          "ord": {
+            "type": "long"
+          },
+          "type": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "number_of_shards": "5",
+        "blocks": {
+          "read_only_allow_delete": "false"
+        },
+        "provided_name": "oztmt-new",
+        "creation_date": "1512198826579",
+        "analysis": {
+          "analyzer": {
+            "autocomplete": {
+              "filter": [
+                "lowercase"
+              ],
+              "tokenizer": "autocomplete"
+            },
+            "autocomplete_search": {
+              "tokenizer": "lowercase"
+            }
+          },
+          "tokenizer": {
+            "autocomplete": {
+              "token_chars": [
+                "letter"
+              ],
+              "min_gram": "1",
+              "type": "edge_ngram",
+              "max_gram": "20"
+            }
+          }
+        },
+        "number_of_replicas": "1",
+        "uuid": "Yiy8DwkWQ2Ol1048zJetEg",
+        "version": {
+          "created": "6000099"
+        }
+      }
+    }
+  }
+}

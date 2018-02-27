@@ -1,0 +1,49 @@
+{
+  "synonim": {
+    "aliases": {},
+    "mappings": {
+      "doc": {
+        "properties": {
+          "synonim": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "analyzer": "my_analyzer"
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "number_of_shards": "5",
+        "blocks": {
+          "read_only_allow_delete": "false"
+        },
+        "provided_name": "synonim",
+        "creation_date": "1516186046180",
+        "analysis": {
+          "analyzer": {
+            "my_analyzer": {
+              "tokenizer": "my_tokenizer"
+            }
+          },
+          "tokenizer": {
+            "my_tokenizer": {
+              "pattern": ",",
+              "type": "pattern"
+            }
+          }
+        },
+        "number_of_replicas": "1",
+        "uuid": "L0H9wr_VQN6D2Yss548Z7A",
+        "version": {
+          "created": "6000099"
+        }
+      }
+    }
+  }
+}

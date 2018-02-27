@@ -1,0 +1,33 @@
+{
+  "correct-key-new": {
+    "aliases": {},
+    "mappings": {
+      "doc": {
+        "properties": {
+          "correct": {
+            "type": "text"
+          },
+          "error": {
+            "type": "text",
+            "analyzer": "keyword"
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "number_of_shards": "5",
+        "blocks": {
+          "read_only_allow_delete": "false"
+        },
+        "provided_name": "correct-key-new",
+        "creation_date": "1512517110241",
+        "number_of_replicas": "1",
+        "uuid": "5hr7A3ciTmekywXVkNJHrQ",
+        "version": {
+          "created": "6000099"
+        }
+      }
+    }
+  }
+}
