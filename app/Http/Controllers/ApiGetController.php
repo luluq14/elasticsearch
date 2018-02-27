@@ -15,7 +15,6 @@ class ApiGetController extends BaseController
     public function __construct()
     {
         $this->host=[
-            // This is effectively equal to: "https://username:password!#$?*abc@foo.com:9200/"
             [
                 'host' =>  env('ELASTICSEARCH_HOST'),
                 'port' =>  env('ELASTICSEARCH_PORT'),
@@ -25,11 +24,22 @@ class ApiGetController extends BaseController
             ]
         ];
     }
+
     public function Mctgr(Request $request,$keyword=""){
         $sort=$request->input('sort');
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
+
+        $keywords=$this->replace($keyword);
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords));
+        if(!$sinonim){
+            $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
+        }else{
+            $sinonim=str_replace(","," OR ",$sinonim);
+        }
+
+        $sinonim=str_replace("/","\\/",$sinonim);
 
         $params = [
             'index' => 'oracle-sync',
@@ -39,8 +49,7 @@ class ApiGetController extends BaseController
                     'bool' => [
                         'must' =>[
                             [
-                                "multi_match"=>[
-                                    "query"=>$keyword,
+                                "query_string"=>[
                                     "type"=> "best_fields",
                                     "fields"=>[
                                         "prd_nm^10",
@@ -48,9 +57,16 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm"
+                                        "brand_nm",
+                                        "_id"
                                     ],
-                                    "operator"=> "and"
+                                    "default_operator"=> "AND",
+                                    "query"=> $sinonim
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "sel_stat_cd" => 103
                                 ]
                             ]
                         ]
@@ -132,11 +148,21 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-    public function Lctgr(Request $request,$keywords=""){
+    public function Lctgr(Request $request,$keyword=""){
         $sort=$request->input('sort');
         $term=$request->input('terms');
         $range=$request->input('range');
         $filter=$request->input('filter');
+
+        $keywords=$this->replace($keyword);
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords));
+        if(!$sinonim){
+            $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
+        }else{
+            $sinonim=str_replace(","," OR ",$sinonim);
+        }
+
+        $sinonim=str_replace("/","\\/",$sinonim);
 
         $params = [
             'index' => 'oracle-sync',
@@ -146,8 +172,7 @@ class ApiGetController extends BaseController
                     'bool' => [
                         'must' => [
                             [
-                                "multi_match"=>[
-                                    "query"=>$keywords,
+                                "query_string"=>[
                                     "type"=> "best_fields",
                                     "fields"=>[
                                         "prd_nm^10",
@@ -155,9 +180,16 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm"
+                                        "brand_nm",
+                                        "_id"
                                     ],
-                                    "operator"=> "and"
+                                    "default_operator"=> "AND",
+                                    "query"=> $sinonim
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "sel_stat_cd" => 103
                                 ]
                             ]
                         ]
@@ -245,6 +277,16 @@ class ApiGetController extends BaseController
         $range=$request->input('range');
         $filter=$request->input('filter');
 
+        $keywords=$this->replace($keyword);
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords));
+        if(!$sinonim){
+            $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
+        }else{
+            $sinonim=str_replace(","," OR ",$sinonim);
+        }
+
+        $sinonim=str_replace("/","\\/",$sinonim);
+
         $params = [
             'index' => 'oracle-sync',
             'size' =>0,
@@ -253,8 +295,7 @@ class ApiGetController extends BaseController
                     'bool' => [
                         'must' =>[
                             [
-                                "multi_match"=>[
-                                    "query"=>$keyword,
+                                "query_string"=>[
                                     "type"=> "best_fields",
                                     "fields"=>[
                                         "prd_nm^10",
@@ -262,9 +303,16 @@ class ApiGetController extends BaseController
                                         "lctgr_nm",
                                         "mctgr_nm",
                                         "sctgr_nm",
-                                        "brand_nm"
+                                        "brand_nm",
+                                        "_id"
                                     ],
-                                    "operator"=> "and"
+                                    "default_operator"=> "AND",
+                                    "query"=> $sinonim
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "sel_stat_cd" => 103
                                 ]
                             ]
                         ]
@@ -336,6 +384,130 @@ class ApiGetController extends BaseController
             }
 
         }
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        return $response;
+    }
+
+    public function ListBrand(Request $request,$keyword=""){
+        $sort=$request->input('sort');
+        $term=$request->input('terms');
+        $range=$request->input('range');
+        $filter=$request->input('filter');
+
+        $keywords=$this->replace($keyword);
+        $sinonim=$this->sinonim(str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords));
+        if(!$sinonim){
+            $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
+        }else{
+            $sinonim=str_replace(","," OR ",$sinonim);
+        }
+
+        $sinonim=str_replace("/","\\/",$sinonim);
+
+        $params = [
+            'index' => 'oracle-sync',
+            'size' =>0,
+            'body' =>[
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            [
+                                "query_string"=>[
+                                    "type"=> "best_fields",
+                                    "fields"=>[
+                                        "prd_nm^10",
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "_id"
+                                    ],
+                                    "default_operator"=> "AND",
+                                    "query"=> $sinonim
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "sel_stat_cd" => 103
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'aggs' =>[
+                    "group_by_no"=> [
+                        "terms"=> [
+                            "field"=> "brand_nm.keyword"
+                        ],
+                        'aggs' =>[
+                            "tops"=> [
+                                "top_hits"=> [
+                                    "_source"=> ["brand_nm","brand_cd"],
+                                    "size" => 1
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        if(!empty($sort)) {
+            $sort=json_decode($sort,true);
+            foreach ($sort as $key => $value) {
+                $params['body']['sort'][] =
+                    [
+                        $key => [
+                            'order' => $value['order']
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($range)) {
+            $range=json_decode($range,true);
+            foreach ($range as $key => $value) {
+                $params['body']['query']['bool']['must'][]['range'] =
+                    [
+                        $key => [
+                            "gte" => $value['gte'],
+                            "lte" => $value['lte'],
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($filter)) {
+            $filter=json_decode($filter,true);
+            foreach ($filter as $key => $value) {
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
+                    [
+                        "terms" => [
+                            $key => $value
+                        ]
+                    ];
+            }
+        }
+
+        if(!empty($term)){
+            $term=json_decode($term,true);
+            foreach ($term as $key => $value){
+                $params['body']['query']['bool']['must'][]=
+                    [
+                        "terms"=> [
+                            $key =>$value
+                        ]
+                    ];
+            }
+
+        }
+
 
         $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
         ->setHosts($this->host)      // Set the hosts
@@ -453,390 +625,6 @@ class ApiGetController extends BaseController
         }
         return $data;
     }
-
-    public function ListBrand(Request $request,$keywords=""){
-        $sort=$request->input('sort');
-        $term=$request->input('terms');
-        $range=$request->input('range');
-        $filter=$request->input('filter');
-
-        $params = [
-            'index' => 'oracle-sync',
-            'size' =>0,
-            'body' =>[
-                'query' => [
-                    'bool' => [
-                        'must' => [
-                            [
-                                "multi_match"=>[
-                                    "query"=>$keywords,
-                                    "type"=> "best_fields",
-                                    "fields"=>[
-                                        "prd_nm^10",
-                                        "nck_nm",
-                                        "lctgr_nm",
-                                        "mctgr_nm",
-                                        "sctgr_nm",
-                                        "brand_nm"
-                                    ],
-                                    "operator"=> "and"
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'aggs' =>[
-                    "group_by_no"=> [
-                        "terms"=> [
-                            "field"=> "brand_nm.keyword"
-                        ],
-                        'aggs' =>[
-                            "tops"=> [
-                                "top_hits"=> [
-                                    "_source"=> ["brand_nm","brand_cd"],
-                                    "size" => 1
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        if(!empty($sort)) {
-            $sort=json_decode($sort,true);
-            foreach ($sort as $key => $value) {
-                $params['body']['sort'][] =
-                    [
-                        $key => [
-                            'order' => $value['order']
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($range)) {
-            $range=json_decode($range,true);
-            foreach ($range as $key => $value) {
-                $params['body']['query']['bool']['must'][]['range'] =
-                    [
-                        $key => [
-                            "gte" => $value['gte'],
-                            "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($filter)) {
-            $filter=json_decode($filter,true);
-            foreach ($filter as $key => $value) {
-                $params['body']['query']['bool']['filter']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($term)){
-            $term=json_decode($term,true);
-            foreach ($term as $key => $value){
-                $params['body']['query']['bool']['must'][]=
-                    [
-                        "terms"=> [
-                            $key =>$value
-                        ]
-                    ];
-            }
-
-        }
-
-
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        return $response;
-    }
-
-
-    public function searchSinonim(Request $request,$keyword=""){
-//        $keyword=addslashes($keyword);
-        $sort=$request->input('sort');
-        $term=$request->input('terms');
-        $range=$request->input('range');
-        $match=$request->input('match');
-        $filter=$request->input('filter');
-        $page=$request->input('page');
-        $limit=$request->input('limit');
-        $from=$page*$limit;
-
-        $keywords=$this->replace($keyword);
-        $suggest=$this->cek($keyword);
-        $booster=$this->booster($keywords);
-
-
-        $params = [
-            'index' => 'oracle-sync',
-            'from' => $from,
-            'size' =>$limit,
-            'body' => [
-                'query' => [
-                    'function_score' =>[
-                        'query'=>[
-                            'bool'=>[
-                                "must"=>[
-                                    [
-                                        "multi_match"=>[
-                                            "query"=> str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~')," ", $keywords),
-                                            "type"=> "best_fields",
-                                            "fields"=>[
-                                                "prd_nm^10",
-                                                "nck_nm",
-                                                "lctgr_nm",
-                                                "mctgr_nm",
-                                                "sctgr_nm",
-                                                "brand_nm"
-                                            ],
-                                            "operator"=> "and"
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                        "boost" => "5",
-                        "functions"=>[
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>360
-                                    ]
-                                ],
-                                "weight"=>5
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>3691
-                                    ]
-                                ],
-                                "weight"=>5
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>326
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>363
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>4995
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>5047
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>417
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>382
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>5012
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>459
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>445
-                                    ]
-                                ],
-                                "weight"=>4
-                            ]
-
-                        ],
-                        "max_boost"=>10,
-                        "score_mode"=> "max",
-                        "boost_mode"=>"multiply",
-                        "min_score" => 1
-                    ]
-                ],
-                'aggs' =>[
-                    "max_price"=> [
-                        "max"=> [
-                            "field"=> "final_dsc_prc"
-                        ]
-                    ],
-                    "min_price"=> [
-                        "min"=> [
-                            "field"=> "final_dsc_prc"
-                        ]
-                    ]
-                ],
-            ]
-        ];
-
-
-        if(!empty($sort)) {
-            $sort=json_decode($sort,true);
-            $keywords=str_replace(str_split('!"#$()*,.:;<=>?@[\]^_`{|}~&%\'+-')," ", $keywords);
-
-            foreach ($sort as $key => $value) {
-
-                if($key=="ctgr_bstng") {
-//                    print_r($booster);
-                    if(count($booster)>0){
-
-                        if(!empty(@$booster[0]['_source']['sctgr_no'])){
-                            $script="(doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." && doc['sctgr_no'].value == ".$booster[0]['_source']['sctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
-
-                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && !empty(@$booster[0]['_source']['mctgr_no'])){
-                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no']." && doc['mctgr_no'].value == ".$booster[0]['_source']['mctgr_no']." ) ? ".$booster[0]['_source']['weight']." : 10";
-
-                        }elseif(empty(@$booster[0]['_source']['sctgr_no']) && empty(@$booster[0]['_source']['mctgr_no']) && !empty(@$booster[0]['_source']['lctgr_no '])){
-                            $script="(doc['lctgr_no'].value == ".$booster[0]['_source']['lctgr_no'].") ? ".$booster[0]['_source']['weight']." : 10";
-
-                        }else{
-//                            $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
-                            $script="doc['sale_score2'].values == 1 ? 10 : 10";
-
-                        }
-                    }else{
-//                        $script="(doc['prd_nm.keyword'].values.contains('".$keywords."')) ? 10 : 10";
-                        $script="doc['sale_score2'].values == 1 ? 10 : 10";
-                    }
-
-                    $params['body']['sort'][] =
-                        [
-                            "_script" => [
-                                'script' => $script,
-                                "type" => "number",
-                                "order" => $value['order']
-                            ]
-                        ];
-                }else{
-                    $params['body']['sort'][] =
-                        [
-                            $key => [
-                                'order' => $value['order']
-                            ]
-                        ];
-                }
-            }
-        }
-        if(!empty($range)) {
-            $range=json_decode($range,true);
-            foreach ($range as $key => $value) {
-             //   $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
-               $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
-                    [
-                        $key => [
-                            "gte" => $value['gte'],
-                            "lte" => $value['lte'],
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($filter)) {
-            $filter=json_decode($filter,true);
-            foreach ($filter as $key => $value) {
-                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
-                    [
-                        "terms" => [
-                            $key => $value
-                        ]
-                    ];
-            }
-        }
-
-        if(!empty($term)){
-            $term=json_decode($term,true);
-            foreach ($term as $key => $value){
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
-      //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
-                    [
-                        "terms"=> [
-                            $key =>$value
-                        ]
-                    ];
-            }
-
-        }
-
-        if(!empty($match)){
-            $match=json_decode($match,true);
-            foreach ($match as $key => $value){
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
-                    //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
-                    [
-                        "match"=> [
-                            $key =>[
-                                "query"     =>  $value,
-                                "operator"  => "and"
-                            ]
-                        ]
-                    ];
-            }
-
-        }
-
-//        print_r($params);die();
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        $response["key"]=$keyword;
-        $response["correct"]=$keywords;
-        $response["suggest"]=$suggest;
-        return $response;
-    }
-
 
     public function checkSuggest($keywords=""){
 
@@ -1052,6 +840,31 @@ class ApiGetController extends BaseController
         return $response['hits']['hits'];
     }
 
+    public function sinonim($keyword=""){
+        $params = [
+            'index' => 'synonim',
+            '_source'=> ["synonim"],
+            'body' => [
+                'query' => [
+                    "match"=>[
+                        "synonim"=> $keyword
+                    ]
+                ]
+            ]
+        ];
+
+        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
+        ->setHosts($this->host)      // Set the hosts
+        ->build();              // Build the client object
+
+        $response = $client->search($params);
+        if(empty($response['hits']['hits'])){
+            return false;
+        }
+
+        return $response['hits']['hits'][0]['_source']['synonim'];
+    }
+
     public function search(Request $request,$keyword=""){
 //        $keyword=addslashes($keyword);
         $sort=$request->input('sort');
@@ -1085,130 +898,31 @@ class ApiGetController extends BaseController
             'size' =>$limit,
             'body' => [
                 'query' => [
-                    'function_score' =>[
-                        'query'=>[
-                            'bool'=>[
-                                "must"=>[
-                                    [
-                                        "query_string"=>[
-                                            "type"=> "best_fields",
-                                            "fields"=>[
-                                                "prd_nm^10",
-                                                "nck_nm",
-                                                "lctgr_nm",
-                                                "mctgr_nm",
-                                                "sctgr_nm",
-                                                "brand_nm",
-                                                "_id"
-                                            ],
-                                            "default_operator"=> "AND",
-                                            "query"=> $sinonim
-                                        ]
+                    'bool'=>[
+                        "must"=>[
+                            [
+                                "query_string"=>[
+                                    "type"=> "best_fields",
+                                    "fields"=>[
+                                        "prd_nm^10",
+                                        "nck_nm",
+                                        "lctgr_nm",
+                                        "mctgr_nm",
+                                        "sctgr_nm",
+                                        "brand_nm",
+                                        "_id"
                                     ],
-                                    [
-                                        "term"=>[
-                                            "sel_stat_cd" => 103
-                                        ]
-                                    ]
+                                    "default_operator"=> "AND",
+                                    "query"=> $sinonim
+                                ]
+                            ],
+                            [
+                                "term"=>[
+                                    "sel_stat_cd" => 103
                                 ]
                             ]
-                        ],
-                        "boost" => "5",
-                        "functions"=>[
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>360
-                                    ]
-                                ],
-                                "weight"=>5
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>3691
-                                    ]
-                                ],
-                                "weight"=>5
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>326
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>363
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>4995
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>5047
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>417
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>382
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>5012
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>459
-                                    ]
-                                ],
-                                "weight"=>4
-                            ],
-                            [
-                                "filter"=>[
-                                    "match"=>[
-                                        "mctgr_no"=>445
-                                    ]
-                                ],
-                                "weight"=>4
-                            ]
+                        ]
 
-                        ],
-                        "max_boost"=>10,
-                        "score_mode"=> "max",
-                        "boost_mode"=>"multiply",
-                        "min_score" => 1
                     ]
                 ],
                 'aggs' =>[
@@ -1273,7 +987,7 @@ class ApiGetController extends BaseController
             $range=json_decode($range,true);
             foreach ($range as $key => $value) {
                 //   $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]['range'] =
-                $params['body']['query']['function_score']['query']['bool']['must'][]['range'] =
+                $params['body']['query']['bool']['must'][]['range'] =
                     [
                         $key => [
                             "gte" => $value['gte'],
@@ -1286,7 +1000,7 @@ class ApiGetController extends BaseController
         if(!empty($filter)) {
             $filter=json_decode($filter,true);
             foreach ($filter as $key => $value) {
-                $params['body']['query']['function_score']['query']['bool']['filter']['bool']['should'][] =
+                $params['body']['query']['bool']['filter']['bool']['should'][] =
                     [
                         "terms" => [
                             $key => $value
@@ -1298,7 +1012,7 @@ class ApiGetController extends BaseController
         if(!empty($term)){
             $term=json_decode($term,true);
             foreach ($term as $key => $value){
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['must'][] =
                     //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "terms"=> [
@@ -1312,7 +1026,7 @@ class ApiGetController extends BaseController
         if(!empty($match)){
             $match=json_decode($match,true);
             foreach ($match as $key => $value){
-                $params['body']['query']['function_score']['query']['bool']['must'][] =
+                $params['body']['query']['bool']['must'][] =
                     //          $params['body']['query']['function_score']['query']['bool']['filter']['bool']['must'][]=
                     [
                         "match"=> [
@@ -1337,28 +1051,5 @@ class ApiGetController extends BaseController
         return $response;
     }
 
-    public function sinonim($keyword=""){
-        $params = [
-            'index' => 'synonim',
-            '_source'=> ["synonim"],
-            'body' => [
-                'query' => [
-                        "match"=>[
-                            "synonim"=> $keyword
-                        ]
-                ]
-            ]
-        ];
 
-        $client = \Elasticsearch\ClientBuilder::create()           // Instantiate a new ClientBuilder
-        ->setHosts($this->host)      // Set the hosts
-        ->build();              // Build the client object
-
-        $response = $client->search($params);
-        if(empty($response['hits']['hits'])){
-            return false;
-        }
-
-        return $response['hits']['hits'][0]['_source']['synonim'];
-    }
 }
