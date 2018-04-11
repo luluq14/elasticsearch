@@ -884,13 +884,12 @@ class ApiGetController extends BaseController
         if(!$sinonim){
             $sinonim=str_replace(str_split('!"#$()*,:;<=>?@[\]^`{|}~')," ", $keywords);
         }else{
-            $sinonim=str_replace(","," OR ",$sinonim);
+            $sinonim=str_replace(",",") OR (",$sinonim);
         }
 
-        $sinonim=str_replace("/","\\/",$sinonim);
+        $sinonim='('.str_replace("/","\\/",$sinonim).')';
 
         $booster=$this->booster($sinonim);
-
 
         $params = [
             'index' => 'oracle-sync',
